@@ -6,14 +6,16 @@ import java.net.URL;
 public class Segment {
 
 	private float duration;
+	private int id;
 	private URI relativePath;
 	private URL url;
 	private float currentPosition;
 	
-	public Segment (float duration, URI relativePath, URL url) {
+	public Segment (int id, float duration, URI relativePath, URL url) {
 		this.setDuration(duration);
 		this.setRelativePath(relativePath);
 		this.setUrl(url);
+		this.setCurrentPosition(id);
 	}
 
 	public URI getRelativePath() {
@@ -46,6 +48,14 @@ public class Segment {
 
 	public void setUrl(URL url) {
 		this.url = url;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 }
