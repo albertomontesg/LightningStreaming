@@ -12,6 +12,8 @@ public abstract class Playlist {
 	private URI path;
 	private URL url;
 	
+	//private int currentSegment;
+	
 	public float getTargetDuration() {
 		return targetDuration;
 	}
@@ -24,8 +26,38 @@ public abstract class Playlist {
 	public void setNumSegments(int numSegments) {
 		this.numSegments = numSegments;
 	}
+	public float getTotalDuration() {
+		return totalDuration;
+	}
+	public void setTotalDuration(float totalDuration) {
+		this.totalDuration = totalDuration;
+	}
+	public int getMediaSequence() {
+		return mediaSequence;
+	}
+	public void setMediaSequence(int mediaSequence) {
+		this.mediaSequence = mediaSequence;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public URI getPath() {
+		return path;
+	}
+	public void setPath(URI path) {
+		this.path = path;
+	}
+	public URL getUrl() {
+		return url;
+	}
+	public void setUrl(URL url) {
+		this.url = url;
+	}
 	
-	//private int currentSegment;
+	
 	
 	
 }
