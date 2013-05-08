@@ -1,4 +1,6 @@
-package com.lightningstreaming;
+package com.lightningstreaming.main;
+
+import com.lightningstreaming.R;
 
 import android.os.Bundle;
 import android.app.Activity;
