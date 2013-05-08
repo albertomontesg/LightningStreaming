@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 
+import com.lightningstreaming.regex.Regex;
+
 public abstract class Playlist {
 	private float targetDuration;
 	private float totalDuration;
@@ -64,6 +66,14 @@ public abstract class Playlist {
 	public void setUrl(URL url) {
 		this.url = url;
 	}
+	public Playlist initialparse(File file, URL url){
+		
+		
+			
+		return null;
+	}
+	public abstract Playlist parse( Playlist playlist, URL url);
+
 	
 	
 	
