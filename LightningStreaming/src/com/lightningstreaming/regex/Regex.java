@@ -3,16 +3,26 @@ package com.lightningstreaming.regex;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.Arrays;
-import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Regex {
 
 	public static String extractString (String input, String beg, String end) {
+		
+		String mydata = "some string with 'the data i want' inside";
+		Pattern pattern = Pattern.compile(beg+"(.*?)"+end);
+		Matcher matcher = pattern.matcher(mydata);
+		if (matcher.find())
+		    return matcher.group(1);
+		else
+			return null;
+		
+		/*
 		Vector<String> v = new Vector<String>(Arrays.asList(input.split(beg)));
 		Vector<String> w = new Vector<String>(Arrays.asList(v.get(1).split(end)));
-		String output = w.get(0); 
-		return output;
+		String output = w.get(0);
+		return output; */
 	}
 	
 	public static int count (String input, String find) {
@@ -43,6 +53,11 @@ public class Regex {
 			System.err.println(e.getMessage());
 		}
 		return data;
+	}
+
+	public static String extractString(String input, String extract) {
+		
+		return null;
 	}
 	
 }

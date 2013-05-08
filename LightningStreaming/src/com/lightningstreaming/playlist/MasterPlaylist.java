@@ -6,12 +6,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import com.lightningstreaming.asynctask.DownloadPlaylist;
 import com.lightningstreaming.regex.Regex;
 
 public class MasterPlaylist {
@@ -29,7 +28,6 @@ public class MasterPlaylist {
 	private List<Integer> qualities;
 	
 	//private int currentSegment;
-	
 	
 	public MasterPlaylist (String name, URI path, URL url, TreeMap<Integer, SegmentPlaylist> streams) {
 		this.setName(name);
@@ -57,11 +55,42 @@ public class MasterPlaylist {
 		
 		TreeMap <Integer, SegmentPlaylist> s = new TreeMap<Integer, SegmentPlaylist>();
 		
+		SegmentPlaylist sp = null;
+		
 		if (Regex.count(data, "EXTINF") > 0) {
-			SegmentPlaylist sp = SegmentPlaylist.parse(file, url);
+			sp = SegmentPlaylist.parse(file, url);
 			s.put(0,sp);
 		}
-		else if (Regex.count(data, "EXT-X-STREAM") > 0)
+		else if (Regex.count(data, "EXT-X-STREAM") > 0) {
+			Vector<String> str = new Vector<String>(Arrays.asList(data.split("#EXTINF")));
+			str.remove(0);
+			DownloadPlaylist downloadStreamIndex = new DownloadPlaylist();
+			
+			
+			for (int i = 0; i < str.size(); i++) {
+				int bandwidth = Integer.parseInt(Regex.extractString(data, "BANDWIDTH=", ","));
+				URL urlStream = null;
+				String stream = Regex.extractString(str.get(i), "\n", "\n");
+				try {
+					if (Regex.count(str.get(i), "www") == 0) {
+						urlStream = new URL(url.toString().replace(n, stream));
+					}
+					else urlStream = new URL(stream);
+					
+					String streamPath = file.getPath().replace(file.getName(), urlStream.getFile());
+							
+					downloadStreamIndex.execute(urlStream, new URL("file", null, streamPath));
+					sp = SegmentPlaylist.parse(downloadStreamIndex.get(), urlStream);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				s.put(bandwidth, sp);
+			}
+		}
+		else {
+			
+		}
 		
 		/*
 		
@@ -93,8 +122,8 @@ public class MasterPlaylist {
 		*/
 		
 		
-		MasterPlayslit playlist = new MasterPlaylist(n, p, url, s);
-		return null;
+		MasterPlaylist playlist = new MasterPlaylist(n, p, url, s);
+		return playlist;
 	}
 
 	public float getTotalDuration() {

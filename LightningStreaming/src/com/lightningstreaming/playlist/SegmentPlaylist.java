@@ -29,7 +29,6 @@ public class SegmentPlaylist {
 		this.setTag(tag);
 		this.segments = segments;
 		
-		
 		// Condicionals for extrange values of targetduration with throws
 	}
 
