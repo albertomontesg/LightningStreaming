@@ -1,5 +1,8 @@
 package com.lightningstreaming.regex;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Vector;
 
@@ -24,6 +27,22 @@ public class Regex {
 		      }
 		}
 		return count;
+	}
+	
+	public static String fileToString(File file) {
+		// Array of the String lines of the file
+		String data = "";
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(file));
+			while (in.ready()) {
+				  String line = in.readLine();
+				  if (!line.equals("")) data += line + "\n";
+				}
+			in.close();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+		return data;
 	}
 	
 }

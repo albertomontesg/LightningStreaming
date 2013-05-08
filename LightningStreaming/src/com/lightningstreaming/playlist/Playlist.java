@@ -1,5 +1,6 @@
 package com.lightningstreaming.playlist;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
 
@@ -13,6 +14,13 @@ public abstract class Playlist {
 	private URL url;
 	
 	//private int currentSegment;
+	
+	public Playlist (float targetDuration, int mediaSequence) {
+		this.setMediaSequence(mediaSequence);
+		this.setTargetDuration(targetDuration);
+	}
+	
+	public abstract Playlist parse(File file, URL url);
 	
 	public float getTargetDuration() {
 		return targetDuration;
