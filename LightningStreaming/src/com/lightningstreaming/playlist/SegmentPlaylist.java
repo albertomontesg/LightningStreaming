@@ -33,9 +33,7 @@ public class SegmentPlaylist {
 		// Condicionals for extrange values of targetduration with throws
 	}
 
-	public int getNumSegments() {
-		return this.segments.size();
-	}
+	
 	
 	public static SegmentPlaylist parse(File file, URL url) {
 		
@@ -124,6 +122,16 @@ public class SegmentPlaylist {
 
 	public void setUrl(URL url) {
 		this.url = url;
+	}
+	
+	public int getNumSegments() {
+		return this.segments.size();
+	}
+	
+	public float getTotalDuration() {
+		float totalDuration = 0;
+		for (int i = 0; i < this.getNumSegments(); i++) totalDuration += this.segments.get(i).getDuration();
+		return totalDuration;
 	}
 	
 }
