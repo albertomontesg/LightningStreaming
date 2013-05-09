@@ -11,7 +11,6 @@ import java.util.Vector;
 import com.lightningstreaming.regex.Regex;
 
 
-
 public class SegmentPlaylist {
 	
 	private String tag;
@@ -36,7 +35,7 @@ public class SegmentPlaylist {
 	
 	public static SegmentPlaylist parse(File file, URL url) {
 		
-		String data = com.lightningstreaming.regex.Regex.fileToString(file);
+		String data = Regex.fileToString(file);
 		
 		float t = -1;
 		int m = -1;
@@ -56,26 +55,8 @@ public class SegmentPlaylist {
 		if (numSegments > 0) {
 			Vector<String> seg = new Vector<String>(Arrays.asList(data.split("#EXTINF")));
 			seg.remove(0);
-			for (int i = 0; i < numSegments; i++) {
-				float dur = Float.parseFloat(Regex.extractString(seg.get(i), ":", ","));
-				URL urlSegment = null;
-				URI rPath = null;
-				//String u;
-				try {
-					
-					urlSegment = new URL(Regex.extractString(seg.get(i), "\n", "\n"));
-					//u = Regex.extractString(seg.get(i), "\n", "\n");
-					
-					if (Regex.count(urlSegment.toString(), "/") > 0) 
-						rPath = url.toURI().relativize(urlSegment.toURI());
-					else
-						rPath = new URI(urlSegment.toString());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				s.add(new Segment (i, dur, rPath, urlSegment));
-			}
+			for (int i = m; i < (numSegments + m); i++)
+				s.add(Segment.parse(seg.get(i), url, i));
 		}
 		
 		SegmentPlaylist playlist = new SegmentPlaylist (t, m, url, tag, s);

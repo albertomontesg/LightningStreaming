@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import com.lightningstreaming.regex.Regex;
+
 import android.os.AsyncTask;
 
 public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
@@ -16,8 +18,10 @@ public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
 	protected File doInBackground(URL... urls) {
 		URL url = urls[0];
 		URL path = (URL) urls[1];
-		String fileName = url.getFile();
-		String dir = path.toString() + fileName;
+		String fileName = Regex.extractFileName(url.getFile());
+		String dir = path.getPath() + fileName;
+		
+		File file = new File(dir);
 		
 		try {
 			
@@ -30,7 +34,7 @@ public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
 
             // Download the file
             InputStream input = new BufferedInputStream(url.openStream());
-            OutputStream output = new FileOutputStream(dir);
+            OutputStream output = new FileOutputStream(file);
 
             byte data[] = new byte[1024];
 
@@ -45,10 +49,6 @@ public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
-		
-		
-		// Parse the file
-		File file = new File(dir);
 		
 		return file;
 	}

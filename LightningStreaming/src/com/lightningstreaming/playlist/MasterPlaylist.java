@@ -13,11 +13,12 @@ import java.util.Vector;
 import com.lightningstreaming.asynctask.DownloadPlaylist;
 import com.lightningstreaming.regex.Regex;
 
+
+
 public class MasterPlaylist {
 
 	private float totalDuration;
 	private int numSegments;
-	
 
 	private String name;
 	private URI path;
@@ -27,7 +28,9 @@ public class MasterPlaylist {
 	private TreeMap<Integer, SegmentPlaylist> streams;
 	private List<Integer> qualities;
 	
-	//private int currentSegment;
+	private int currentSegment;
+	private SegmentPlaylist currentStream;
+	private int currentQuality;
 	
 	public MasterPlaylist (String name, URI path, URL url, TreeMap<Integer, SegmentPlaylist> streams) {
 		this.setName(name);
@@ -37,7 +40,11 @@ public class MasterPlaylist {
 		this.setNumStreams(streams.size());
 		List<Integer> keys = new ArrayList<Integer>(streams.keySet());
 		this.setQualities(keys);
-		this.setTotalDuration(streams.get(0).getTotalDuration());
+		this.setTotalDuration(streams.get(this.getQualities().get(0)).getTotalDuration());
+		this.setNumSegments(this.getNumSegments());
+		this.setCurrentQuality(this.getStreams().lastKey());
+		this.setCurrentStream(this.getStream(this.getCurrentQuality()));
+		this.setCurrentSegment(this.getCurrentStream().getMediaSequence());
 	}
 
 	public static MasterPlaylist parse(File file, URL url) {
@@ -62,13 +69,13 @@ public class MasterPlaylist {
 			s.put(0,sp);
 		}
 		else if (Regex.count(data, "EXT-X-STREAM") > 0) {
-			Vector<String> str = new Vector<String>(Arrays.asList(data.split("#EXTINF")));
+			Vector<String> str = new Vector<String>(Arrays.asList(data.split("#EXT-X-STREAM-INF:")));
 			str.remove(0);
 			DownloadPlaylist downloadStreamIndex = new DownloadPlaylist();
 			
 			
 			for (int i = 0; i < str.size(); i++) {
-				int bandwidth = Integer.parseInt(Regex.extractString(data, "BANDWIDTH=", ","));
+				int bandwidth = Integer.parseInt(Regex.extractString(str.get(i), "BANDWIDTH=", ","));
 				URL urlStream = null;
 				String stream = Regex.extractString(str.get(i), "\n", "\n");
 				try {
@@ -77,7 +84,7 @@ public class MasterPlaylist {
 					}
 					else urlStream = new URL(stream);
 					
-					String streamPath = file.getPath().replace(file.getName(), urlStream.getFile());
+					String streamPath = file.getPath().replace(file.getName(), Regex.extractFileName(urlStream.toString()));
 							
 					downloadStreamIndex.execute(urlStream, new URL("file", null, streamPath));
 					sp = SegmentPlaylist.parse(downloadStreamIndex.get(), urlStream);
@@ -89,38 +96,8 @@ public class MasterPlaylist {
 			}
 		}
 		else {
-			
+			return null;
 		}
-		
-		/*
-		
-		int numSegments = Regex.count(data, "#EXTINF:");
-		if (numSegments > 0) {
-			Vector<String> seg = new Vector<String>(Arrays.asList(data.split("#EXTINF")));
-			seg.remove(0);
-			for (int i = 0; i < numSegments; i++) {
-				float dur = Float.parseFloat(Regex.extractString(seg.get(i), ":", ","));
-				URL urlSegment = null;
-				URI rPath = null;
-				//String u;
-				try {
-					
-					urlSegment = new URL(Regex.extractString(seg.get(i), "\n", "\n"));
-					//u = Regex.extractString(seg.get(i), "\n", "\n");
-					
-					if (Regex.count(urlSegment.toString(), "/") > 0) 
-						rPath = url.toURI().relativize(urlSegment.toURI());
-					else
-						rPath = new URI(urlSegment.toString());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				s.add(new Segment (i, dur, rPath, urlSegment));
-			}
-		}
-		*/
-		
 		
 		MasterPlaylist playlist = new MasterPlaylist(n, p, url, s);
 		return playlist;
@@ -170,8 +147,6 @@ public class MasterPlaylist {
 		return streams;
 	}
 
-
-
 	public void setStreams(TreeMap<Integer, SegmentPlaylist> streams) {
 		this.streams = streams;
 	}
@@ -191,5 +166,51 @@ public class MasterPlaylist {
 	public void setQualities(List<Integer> qualities) {
 		this.qualities = qualities;
 	}
+	
+	public SegmentPlaylist getStream (int i) {
+		return this.streams.get(i);
+	}
 
+	public int getCurrentSegment() {
+		return currentSegment;
+	}
+
+	public void setCurrentSegment(int currentSegment) {
+		this.currentSegment = currentSegment;
+	}
+
+	public SegmentPlaylist getCurrentStream() {
+		return currentStream;
+	}
+
+	public void setCurrentStream(SegmentPlaylist currentStream) {
+		this.currentStream = currentStream;
+	}
+
+	public void increaseQuality() {
+		int q = qualities.indexOf(this.getCurrentQuality());
+		if (q >= 0 && q < this.getNumStreams() - 1) q++;
+		this.setCurrentQuality(qualities.get(q));
+	}
+	
+	public void decreaseQuality() {
+		int q = qualities.indexOf(this.getCurrentQuality());
+		if (q > 0 && q <= this.getNumStreams() - 1) q--;
+		this.setCurrentQuality(qualities.get(q));
+	}
+	
+	public boolean isOnlySegmentPlaylist() {
+		return (this.getNumStreams() == 1);
+	}
+
+	public int getCurrentQuality() {
+		return currentQuality;
+	}
+
+	public void setCurrentQuality(int currentQuality) {
+		this.currentQuality = currentQuality;
+		if (qualities.contains(currentQuality))
+			this.currentStream = streams.get(currentQuality);
+	}
+	
 }
