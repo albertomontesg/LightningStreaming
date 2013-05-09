@@ -16,7 +16,7 @@ public class Regex {
 		if (matcher.find())
 		    return matcher.group(1);
 		else
-			return null;
+			return input;
 	}
 	
 	public static int count (String input, String find) {
@@ -55,7 +55,7 @@ public class Regex {
 		if (matcher.find())
 		    return matcher.group(1);
 		else
-			return null;
+			return input;
 		
 	}
 	
@@ -66,12 +66,19 @@ public class Regex {
 	}
 	
 	public static String extractFileName(String path) {
-		String[] t = path.split("/");	
-		return t[t.length -1];
+		String[] t = path.split("/");
+		if (path.endsWith("/"))
+			return null;
+		else
+			return t[t.length -1];
+	}
+	
+	public static String getDirectory(String path) {
+		return Regex.extractString(path, Regex.extractFileName(path));
 	}
 
-	public static String getUrlPath(URL url) {
-		String u = url.toString();
-		return Regex.extractString(u, Regex.extractFileName(url.toString()));
+	public static String getDirectory(URL path) {
+		return Regex.extractString(path.toString(), Regex.extractFileName(path.toString()));
 	}
+
 }

@@ -17,11 +17,13 @@ public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
 	@Override
 	protected File doInBackground(URL... urls) {
 		URL url = urls[0];
-		URL path = (URL) urls[1];
-		String fileName = Regex.extractFileName(url.getFile());
-		String dir = path.getPath() + fileName;
+		URL p = (URL) urls[1];
+		String path = Regex.getDirectory(p.getPath());
+		String fileName = Regex.extractFileName(url.toString());
 		
-		File file = new File(dir);
+		File directory = new File(path);
+		directory.mkdir();
+		File file = new File(path+fileName);
 		
 		try {
 			
@@ -34,7 +36,7 @@ public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
 
             // Download the file
             InputStream input = new BufferedInputStream(url.openStream());
-            OutputStream output = new FileOutputStream(file);
+            OutputStream output = new FileOutputStream(file.getPath());
 
             byte data[] = new byte[1024];
 

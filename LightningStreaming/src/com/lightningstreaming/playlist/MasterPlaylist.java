@@ -18,8 +18,10 @@ import com.lightningstreaming.regex.Regex;
 public class MasterPlaylist {
 
 	private float totalDuration;
+	
+	@SuppressWarnings("unused")
 	private int numSegments;
-
+	
 	private String name;
 	private URI path;
 	private URL url;
@@ -41,7 +43,7 @@ public class MasterPlaylist {
 		List<Integer> keys = new ArrayList<Integer>(streams.keySet());
 		this.setQualities(keys);
 		this.setTotalDuration(streams.get(this.getQualities().get(0)).getTotalDuration());
-		this.setNumSegments(this.getNumSegments());
+		this.numSegments = this.getNumSegments();
 		this.setCurrentQuality(this.getStreams().lastKey());
 		this.setCurrentStream(this.getStream(this.getCurrentQuality()));
 		this.setCurrentSegment(this.getCurrentStream().getMediaSequence());
@@ -71,7 +73,7 @@ public class MasterPlaylist {
 		else if (Regex.count(data, "EXT-X-STREAM") > 0) {
 			Vector<String> str = new Vector<String>(Arrays.asList(data.split("#EXT-X-STREAM-INF:")));
 			str.remove(0);
-			DownloadPlaylist downloadStreamIndex = new DownloadPlaylist();
+			DownloadPlaylist downloadStreamIndex;
 			
 			
 			for (int i = 0; i < str.size(); i++) {
@@ -84,9 +86,11 @@ public class MasterPlaylist {
 					}
 					else urlStream = new URL(stream);
 					
-					String streamPath = file.getPath().replace(file.getName(), Regex.extractFileName(urlStream.toString()));
-							
-					downloadStreamIndex.execute(urlStream, new URL("file", null, streamPath));
+					String streamPath = file.getPath().replace(file.getName(), stream);
+						
+					downloadStreamIndex = new DownloadPlaylist();
+					URL dir = new URL("file", null, streamPath);
+					downloadStreamIndex.execute(urlStream, dir);
 					sp = SegmentPlaylist.parse(downloadStreamIndex.get(), urlStream);
 					
 				} catch (Exception e) {
@@ -112,11 +116,7 @@ public class MasterPlaylist {
 	}
 
 	public int getNumSegments() {
-		return numSegments;
-	}
-
-	public void setNumSegments(int numSegments) {
-		this.numSegments = numSegments;
+		return this.streams.get(streams.firstKey()).getNumSegments();
 	}
 
 	public String getName() {

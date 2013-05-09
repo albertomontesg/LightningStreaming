@@ -1,7 +1,5 @@
 package com.lightningstreaming.main;
 
-
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,14 +9,13 @@ import com.lightningstreaming.R;
 import com.lightningstreaming.asynctask.DownloadPlaylist;
 import com.lightningstreaming.playlist.MasterPlaylist;
 
-
-
-
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.view.View.OnClickListener;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -47,36 +44,46 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private OnClickListener buttonA = new OnClickListener() {
 		public void onClick(View v){
-			URL url = null;
-			URL dir = null;
-			try {
-				url = new URL("https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_4x3/gear1/prog_index.m3u8");
-				dir = new URL("file", null, getResources().getString(R.string.app_path));
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			}
+			TextView text = (TextView) findViewById(R.id.textView1);
+			text.setText("Downloading SegmentPlaylist...");
 			
-			DownloadPlaylist d = new DownloadPlaylist();
-			d.execute(url,dir);
-			MasterPlaylist playlist = null;
-			try {
-				playlist = MasterPlaylist.parse(d.get(), url);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
-			playlist.setName("hola");
+			PressedButton pressedAction = new PressedButton();
+			pressedAction.execute("S");
 		}
 	};
 	
 	private OnClickListener buttonB = new OnClickListener() {
 		public void onClick(View v){
+			TextView text = (TextView) findViewById(R.id.textView1);
+			text.setText("Downloading MasterPlaylist...");
+			
+			PressedButton pressedAction = new PressedButton();
+			pressedAction.execute("M");
+		}
+	};
+
+	class PressedButton extends AsyncTask<Object, Object, Object> {
+
+		@Override
+		protected void onPostExecute(Object result) {
+			TextView text = (TextView) findViewById(R.id.textView1);
+			text.append("Done");
+		}
+		
+		@Override
+		protected Object doInBackground(Object... params) {
 			URL url = null;
 			URL dir = null;
+			String input = (String) params[0];
+			
 			try {
-				url = new URL("https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8");
-				dir = new URL("file", null, getResources().getString(R.string.app_path));
+				if (input.contentEquals("M")) {
+					url = new URL("https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8");
+					dir = new URL("file", null, getResources().getString(R.string.app_path)+"MasterPlaylist/");
+				} else {
+					url = new URL("https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_4x3/gear1/prog_index.m3u8");
+					dir = new URL("file", null, getResources().getString(R.string.app_path)+"SegmentPlaylist/");
+				}
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
@@ -92,13 +99,16 @@ public class MainActivity extends Activity implements OnClickListener {
 				e.printStackTrace();
 			}
 			playlist.setName("hola");
+			
+			
+			return input;
 		}
-	};
-
-
-	@Override
-	public void onClick(View arg0) {
-		
 	}
 
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		
+	}
 }
+

@@ -28,7 +28,7 @@ public class Segment {
 		try {
 			
 			if (Regex.count(u, "www") == 0)
-				urlSegment = new URL(Regex.getUrlPath(url) + u);
+				urlSegment = new URL(Regex.getDirectory(url.toString()) + u);
 			else
 				urlSegment = new URL(u);
 			
