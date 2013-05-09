@@ -3,28 +3,24 @@ package com.lightningstreaming.playlist;
 import java.net.URI;
 import java.net.URL;
 
-<<<<<<< HEAD
-public class Segment {
-
-	private float duration;
-=======
 import com.lightningstreaming.regex.Regex;
 
 public class Segment {
 
 	private float duration;
 	private int id;
->>>>>>> parsing-Alberto
+
 	private URI relativePath;
 	private URL url;
 	private float currentPosition;
 	
-<<<<<<< HEAD
+
 	public Segment (float duration, URI relativePath, URL url) {
 		this.setDuration(duration);
 		this.setRelativePath(relativePath);
 		this.setUrl(url);
-=======
+	}
+
 	public Segment (int id, float duration, URI relativePath, URL url) {
 		this.setDuration(duration);
 		this.setRelativePath(relativePath);
@@ -56,7 +52,6 @@ public class Segment {
 		Segment seg = new Segment(id, dur, rPath, urlSegment);
 		
 		return seg;
->>>>>>> parsing-Alberto
 	}
 
 	public URI getRelativePath() {
@@ -91,8 +86,6 @@ public class Segment {
 		this.url = url;
 	}
 
-<<<<<<< HEAD
-=======
 	public int getId() {
 		return id;
 	}
@@ -101,5 +94,4 @@ public class Segment {
 		this.id = id;
 	}
 
->>>>>>> parsing-Alberto
 }

@@ -1,26 +1,17 @@
 package com.lightningstreaming.regex;
 
-<<<<<<< HEAD
-import java.util.Arrays;
-import java.util.Vector;
-=======
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
->>>>>>> parsing-Alberto
+
 
 public class Regex {
 
 	public static String extractString (String input, String beg, String end) {
-<<<<<<< HEAD
-		Vector<String> v = new Vector<String>(Arrays.asList(input.split(beg)));
-		Vector<String> w = new Vector<String>(Arrays.asList(v.get(1).split(end)));
-		String output = w.get(0); 
-		return output;
-=======
 		
 		Pattern pattern = Pattern.compile(beg+"(.*?)"+end);
 		Matcher matcher = pattern.matcher(input);
@@ -28,7 +19,6 @@ public class Regex {
 		    return matcher.group(1);
 		else
 			return null;
->>>>>>> parsing-Alberto
 	}
 	
 	public static int count (String input, String find) {
@@ -45,8 +35,6 @@ public class Regex {
 		return count;
 	}
 	
-<<<<<<< HEAD
-=======
 	public static String fileToString(File file) {
 		// Array of the String lines of the file
 		String data = "";
@@ -88,5 +76,5 @@ public class Regex {
 		String u = url.toString();
 		return Regex.extractString(u, Regex.extractFileName(url.toString()));
 	}
->>>>>>> parsing-Alberto
+
 }

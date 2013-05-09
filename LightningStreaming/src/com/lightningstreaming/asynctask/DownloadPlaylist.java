@@ -1,9 +1,5 @@
 package com.lightningstreaming.asynctask;
 
-<<<<<<< HEAD
-import java.io.File;
-import java.net.URL;
-=======
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,18 +9,19 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import com.lightningstreaming.regex.Regex;
->>>>>>> parsing-Alberto
 
 import android.os.AsyncTask;
 
+/**
+ * AsyncTask that Downloads a Playlist from an URL and save it on a specific directory
+ * @author Alberto Montes
+ *
+ */
 public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
 
 	@Override
 	protected File doInBackground(URL... urls) {
-<<<<<<< HEAD
-		// TODO Auto-generated method stub
-		return null;
-=======
+
 		URL url = urls[0];
 		URL path = (URL) urls[1];
 		String fileName = Regex.extractFileName(url.getFile());
@@ -34,12 +31,9 @@ public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
 		
 		try {
 			
-			
 			URLConnection connection = url.openConnection();
             connection.connect();
             // int fileLength = connection.getContentLength();
-            
-            
 
             // Download the file
             InputStream input = new BufferedInputStream(url.openStream());
@@ -50,7 +44,6 @@ public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
             int count;
             count = input.read(data);
             output.write(data, 0, count);
-            //while ((count = input.read(data)) != -1) output.write(data, 0, count);
 
             output.flush();
             output.close();
@@ -60,7 +53,7 @@ public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
 		}
 		
 		return file;
->>>>>>> parsing-Alberto
+
 	}
 
 }

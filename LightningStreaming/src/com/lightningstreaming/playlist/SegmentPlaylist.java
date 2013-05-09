@@ -21,6 +21,8 @@ public class SegmentPlaylist {
 	
 	List<Segment> segments;
 	
+	
+	
 	public SegmentPlaylist(float targetDuration, int mediaSequence, URL url, String tag, List<Segment> segments) {
 		this.setTargetDuration(targetDuration);
 		this.setMediaSequence(mediaSequence);
@@ -32,7 +34,12 @@ public class SegmentPlaylist {
 	}
 
 	
-	
+	/**
+	 * Parses a SegmentPlaylist passed through the File downloaded.
+	 * @param file
+	 * @param url
+	 * @return Returns a Segment Playlist parsed.
+	 */
 	public static SegmentPlaylist parse(File file, URL url) {
 		
 		String data = Regex.fileToString(file);

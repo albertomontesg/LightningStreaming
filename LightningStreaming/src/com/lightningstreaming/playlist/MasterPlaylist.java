@@ -47,6 +47,12 @@ public class MasterPlaylist {
 		this.setCurrentSegment(this.getCurrentStream().getMediaSequence());
 	}
 
+	/**
+	 * Parses the File passed through.
+	 * @param file
+	 * @param url
+	 * @return Return a MasterPlaylist parsed from the file given
+	 */
 	public static MasterPlaylist parse(File file, URL url) {
 		
 		String data = Regex.fileToString(file);
