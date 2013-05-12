@@ -5,7 +5,7 @@ public class ParsingException extends Exception{
 	/**
 	 * 
 	 */
-	private String message="This is not an m3u8 file";
+	private String message="Parsing ERROR";
 	private static final long serialVersionUID = 1L;
 
 	public String getMessage() {
