@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import com.lightningstreaming.asynctask.DownloadPlaylist;
+import com.lightningstreaming.exceptions.ParsingException;
 import com.lightningstreaming.regex.Regex;
 
 
@@ -70,6 +71,15 @@ public class MasterPlaylist {
 		
 		SegmentPlaylist sp = null;
 		
+		try{
+			if(Regex.count(data, "#EXTM3U")!=1);
+			{
+				throw new ParsingException();
+			}
+		}
+		catch(ParsingException e){
+			System.out.println(e.getMessage());
+		}
 		if (Regex.count(data, "EXTINF") > 0) {
 			sp = SegmentPlaylist.parse(file, url);
 			s.put(0,sp);
@@ -107,6 +117,10 @@ public class MasterPlaylist {
 		
 		MasterPlaylist playlist = new MasterPlaylist(n, p, url, s);
 		return playlist;
+	}
+	public void ChangeStream(int quality){
+		currentStream=streams.get(quality);
+		
 	}
 
 	public float getTotalDuration() {
