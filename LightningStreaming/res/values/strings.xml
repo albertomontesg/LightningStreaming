@@ -6,8 +6,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="app_path">/mnt/sdcard/LightningStreaming/</string>
     <string name="download">Download file and parse it</string>
-    <string name="segements">Segments playlist</string>
+    <string name="segments">Segments playlist</string>
     <string name="master">Master Playlist</string>
     <string name="play_button">Play Video</string>
-
+	<string name="segments_download">Segments Downloaded</string>
+	<string name="download_button">Download Segments</string>
+    
 </resources>

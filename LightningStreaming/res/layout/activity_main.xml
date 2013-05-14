@@ -24,7 +24,7 @@
         android:layout_alignLeft="@+id/button1"
         android:layout_below="@+id/textView1"
         android:layout_marginTop="20dp"
-        android:text="@string/segements" />
+        android:text="@string/segments" />
 
     <Button
         android:id="@+id/button2"
@@ -59,5 +59,22 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:text="@string/play_button" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button3"
+        android:layout_marginTop="28dp"
+        android:layout_toLeftOf="@+id/button3"
+        android:text="" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button2"
+        android:layout_below="@+id/textView4"
+        android:text="@string/download_button" />
 
 </RelativeLayout>
