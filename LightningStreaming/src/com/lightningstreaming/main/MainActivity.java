@@ -9,9 +9,13 @@ import com.lightningstreaming.R;
 import com.lightningstreaming.asynctask.DownloadPlaylist;
 import com.lightningstreaming.playlist.MasterPlaylist;
 
+import io.vov.vitamio.activity.VideoActivity;
+
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -25,10 +29,25 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		
 		Button bSegments = (Button) this.findViewById(R.id.button1);
 		Button bMaster = (Button) this.findViewById(R.id.button2);
+		Button bPlay = (Button) this.findViewById(R.id.button3);
 		bSegments.setOnClickListener(buttonA);
 		bMaster.setOnClickListener(buttonB);
+		bPlay.setOnClickListener( new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				String url = "https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8";
+				
+				Intent i = new Intent(getApplicationContext(), VideoActivity.class);
+				i.setData(Uri.parse(url));
+				i.putExtra("displayName", "Prueba");
+				startActivity(i);
+			}
+			
+		});
 		
 		File directory = new File(getResources().getString(R.string.app_path));
 		directory.mkdirs();
