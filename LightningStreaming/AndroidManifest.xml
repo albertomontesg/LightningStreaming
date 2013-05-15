@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.lightningstreaming"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.lightningstreaming"
     android:versionCode="1"
-    android:versionName="0.1" xmlns:android="http://schemas.android.com/apk/res/android">
+    android:versionName="0.1" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -23,7 +24,6 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        
         <activity
             android:name="com.lightningstreaming.main.MainActivity"
             android:label="@string/app_name" >
@@ -33,7 +33,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
         <activity
             android:name="io.vov.vitamio.activity.InitActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
@@ -52,6 +51,14 @@
         <service
             android:name="io.vov.vitamio.activity.PlayerService"
             android:process=":vitamio" />
+
+        <activity
+            android:name="com.lightningstreaming.activity.PlayerActivity"
+            android:label="@string/title_activity_player"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateAlwaysHidden" >
+        </activity>
     </application>
 
 </manifest>

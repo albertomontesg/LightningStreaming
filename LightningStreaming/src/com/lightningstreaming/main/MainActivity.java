@@ -6,11 +6,10 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
 import com.lightningstreaming.R;
+import com.lightningstreaming.activity.PlayerActivity;
 import com.lightningstreaming.asynctask.DownloadPlaylist;
 import com.lightningstreaming.asynctask.DownloadSegments;
 import com.lightningstreaming.playlist.MasterPlaylist;
-
-import io.vov.vitamio.activity.VideoActivity;
 
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -47,10 +46,11 @@ public class MainActivity extends Activity implements OnClickListener {
 				//String url = "http://meta.video.qiyi.com/255/dfbdc129b8d18e10d6c593ed44fa6df9.m3u8";
 				//String url = "http://3glivehntv.doplive.com.cn/video1/index_128k.m3u8";
 				//String url = "file:/mnt/sdcard/LightningStreaming/Segmentos/fileSequence0.ts";
-				
-				Intent i = new Intent(getApplicationContext(), VideoActivity.class);
+				String nameVideo = "Marco";
+				Intent i = new Intent(getApplicationContext(), PlayerActivity.class);
 				i.setData(Uri.parse(url));
-				i.putExtra("displayName", "Prueba");
+				i.putExtra("displayName", nameVideo);
+				i.putExtra("UrlPlaylist", url);
 				startActivity(i);
 			}
 			
