@@ -53,11 +53,11 @@ public class DownloadSegments extends AsyncTask<Object, Object, Object> {
 	            OutputStream output = new FileOutputStream(file.getPath());
 
 	            byte data[] = new byte[1024];
-
+	            
 	            int count;
-	            count = input.read(data);
-	            output.write(data, 0, count);
-	            //while ((count = input.read(data)) != -1) output.write(data, 0, count);
+	            //count = input.read(data);
+	            //output.write(data, 0, count);
+	            while ((count = input.read(data)) != -1) output.write(data, 0, count);
 
 	            output.flush();
 	            output.close();

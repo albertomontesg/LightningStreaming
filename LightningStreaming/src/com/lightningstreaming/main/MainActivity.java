@@ -42,10 +42,11 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			@Override
 			public void onClick(View v) {
+				String url = "https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_4x3/gear1/prog_index.m3u8";
 				//String url = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
 				//String url = "http://meta.video.qiyi.com/255/dfbdc129b8d18e10d6c593ed44fa6df9.m3u8";
 				//String url = "http://3glivehntv.doplive.com.cn/video1/index_128k.m3u8";
-				String url = "file:/mnt/sdcard/LightningStreaming/Segmentos/fileSequence0.ts";
+				//String url = "file:/mnt/sdcard/LightningStreaming/Segmentos/fileSequence0.ts";
 				
 				Intent i = new Intent(getApplicationContext(), VideoActivity.class);
 				i.setData(Uri.parse(url));
@@ -132,7 +133,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
 		
 	}
 	
