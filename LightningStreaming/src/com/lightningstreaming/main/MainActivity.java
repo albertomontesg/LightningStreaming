@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.lightningstreaming.R;
 import com.lightningstreaming.asynctask.DownloadPlaylist;
+import com.lightningstreaming.exceptions.CouldNotDownloadFilesException;
 import com.lightningstreaming.playlist.MasterPlaylist;
 
 import android.os.AsyncTask;
@@ -84,10 +85,10 @@ public class MainActivity extends Activity implements OnClickListener {
 			
 			try {
 				if (input.contentEquals("M")) {
-					url = new URL("https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8");
+					url = new URL("http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8");
 					dir = new URL("file", null, getResources().getString(R.string.app_path)+"MasterPlaylist/");
 				} else {
-					url = new URL("https://devimages.apple.com.edgekey.net/resources/http-streaming/examples/bipbop_4x3/gear1/prog_index.m3u8");
+					url = new URL("http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8");
 					dir = new URL("file", null, getResources().getString(R.string.app_path)+"SegmentPlaylist/");
 				}
 			} catch (MalformedURLException e) {
@@ -103,10 +104,14 @@ public class MainActivity extends Activity implements OnClickListener {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			playlist = MasterPlaylist.parse(files.get(0), url);
-			
-			playlist.setName("hola");
-			
+			if (files != null) {
+				try {
+					playlist = MasterPlaylist.parse(files.get(0), url);
+					playlist.setName("hola");
+				} catch (CouldNotDownloadFilesException e) {
+					e.printStackTrace();
+				}
+			}
 			
 			return input;
 		}

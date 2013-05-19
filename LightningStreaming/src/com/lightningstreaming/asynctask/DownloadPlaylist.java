@@ -20,6 +20,8 @@ public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
 	protected Object doInBackground(Object... params) {
 		List<URL> urls = new ArrayList<URL>();
 		List<URL> paths = new ArrayList<URL>();
+		boolean successDownload = true;
+		
 		if (params[0] instanceof ArrayList && params[1] instanceof ArrayList) {
 			urls = (List<URL>) params[0];
 			paths = (List<URL>) params[1];
@@ -41,17 +43,18 @@ public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
 			directory.mkdir();
 			File file = new File(path+fileName);
 			
+			
 			if (!file.exists())
-				downloadFile(url, file);
+				successDownload = downloadFile(url, file);
 			files.add(file);
 			
 		}
-		
-		return files;
+		if (!successDownload) return null;
+		else return files;
 	}
 
 	@SuppressWarnings("unused")
-	private void downloadFile(URL url, File outputFile) {
+	private boolean downloadFile(URL url, File outputFile) {
 		try {
 			
 			URLConnection connection = url.openConnection();
@@ -77,9 +80,11 @@ public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
             output.flush();
             output.close();
             
+            return true;
             
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
+			return false;
 		}
 	}
 	

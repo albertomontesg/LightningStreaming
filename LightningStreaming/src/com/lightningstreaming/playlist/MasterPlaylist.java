@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import com.lightningstreaming.asynctask.DownloadPlaylist;
+import com.lightningstreaming.exceptions.CouldNotDownloadFilesException;
 import com.lightningstreaming.regex.Regex;
 
 
@@ -50,7 +51,7 @@ public class MasterPlaylist {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static MasterPlaylist parse(File file, URL url) {
+	public static MasterPlaylist parse(File file, URL url) throws CouldNotDownloadFilesException {
 		
 		String data = Regex.fileToString(file);
 		
@@ -82,7 +83,7 @@ public class MasterPlaylist {
 			
 			
 			for (int i = 0; i < str.size(); i++) {
-				int bandwidth = Integer.parseInt(Regex.extractString(str.get(i), "BANDWIDTH=", ","));
+				int bandwidth = Integer.parseInt(Regex.extractString(str.get(i), "BANDWIDTH=", "\n"));
 				playlistBandwidth.add(bandwidth);
 				URL urlStream = null;
 				String stream = Regex.extractString(str.get(i), "\n", "\n");
@@ -114,6 +115,8 @@ public class MasterPlaylist {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			if (filesDownloaded == null) throw new CouldNotDownloadFilesException();
 			
 			for (int i = 0; i < filesDownloaded.size(); i++) {
 				sp = SegmentPlaylist.parse(filesDownloaded.get(i), playlistUrls.get(i));
