@@ -60,4 +60,12 @@
         android:layout_marginTop="32dp"
         android:text="@string/play_video" />
 
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button3"
+        android:layout_centerHorizontal="true"
+        android:text="@string/download_segments" />
+
 </RelativeLayout>

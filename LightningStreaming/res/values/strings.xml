@@ -9,5 +9,8 @@
     <string name="segements">Segments playlist</string>
     <string name="master">Master Playlist</string>
     <string name="play_video">Play Video</string>
+    <string name="download_segments">Download Segments</string>
+    <string name="segements_downloaded">Segments Downloaded</string>
+    <string name="title_activity_video">VideoActivity</string>
 
 </resources>

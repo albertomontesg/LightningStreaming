@@ -1,14 +1,14 @@
 package com.lightningstreaming.main;
 
-import io.vov.vitamio.activity.VideoActivity;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
 import com.lightningstreaming.R;
+import com.lightningstreaming.activity.VideoActivity;
 import com.lightningstreaming.asynctask.DownloadPlaylist;
+import com.lightningstreaming.asynctask.DownloadSegments;
 import com.lightningstreaming.exceptions.CouldNotDownloadFilesException;
 import com.lightningstreaming.playlist.MasterPlaylist;
 
@@ -33,6 +33,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		Button bSegments = (Button) this.findViewById(R.id.button1);
 		Button bMaster = (Button) this.findViewById(R.id.button2);
 		Button bPlay = (Button) this.findViewById(R.id.button3);
+		Button bDownload = (Button) this.findViewById(R.id.button4);
 		bSegments.setOnClickListener(buttonA);
 		bMaster.setOnClickListener(buttonB);
 		
@@ -40,8 +41,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			@Override
 			public void onClick(View v) {
-				//String url = "file:/mnt/sdcard/LightningStreaming/Segmentos/fileSequenceTotal.ts";
-				String url = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
+				String url = "file:/mnt/sdcard/LightningStreaming/Segmentos/fileSequenceTotal.ts";
+				//String url = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
 				//String url = "http://meta.video.qiyi.com/255/dfbdc129b8d18e10d6c593ed44fa6df9.m3u8";
 				//String url = "http://3glivehntv.doplive.com.cn/video1/index_128k.m3u8";
 				//String url = "file:/mnt/sdcard/LightningStreaming/Segmentos/fileSequence0.ts";
@@ -50,10 +51,28 @@ public class MainActivity extends Activity implements OnClickListener {
 				i.setData(Uri.parse(url));
 				i.putExtra("displayName", nameVideo);
 				i.putExtra("UrlPlaylist", url);
+
+				
 				startActivity(i);
 			}
 			
 		});
+		
+		bDownload.setOnClickListener( new OnClickListener() {
+		public void onClick(View v){
+			String path = getResources().getString(R.string.app_path);
+			DownloadSegments d = new DownloadSegments();
+			d.execute(path);
+			try {
+				d.get();
+				Button b = (Button) findViewById(R.id.button4);
+				b.setText(getResources().getString(R.string.segements_downloaded));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+	});
 		
 		File directory = new File(getResources().getString(R.string.app_path));
 		directory.mkdirs();
