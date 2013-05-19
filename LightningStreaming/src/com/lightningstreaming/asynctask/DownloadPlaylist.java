@@ -4,55 +4,83 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.lightningstreaming.regex.Regex;
 
 import android.os.AsyncTask;
 
-public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
+public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
 
+	@SuppressWarnings({ "unchecked" })
 	@Override
-	protected File doInBackground(URL... urls) {
-		URL url = urls[0];
-		URL p = (URL) urls[1];
-		String path = Regex.getDirectory(p.getPath());
-		String fileName = Regex.extractFileName(url.toString());
+	protected Object doInBackground(Object... params) {
+		List<URL> urls = new ArrayList<URL>();
+		List<URL> paths = new ArrayList<URL>();
+		if (params[0] instanceof ArrayList && params[1] instanceof ArrayList) {
+			urls = (List<URL>) params[0];
+			paths = (List<URL>) params[1];
+		}
+		else if (params[0].getClass().equals(URL.class) && params[1].getClass().equals(URL.class)) {
+			urls.add((URL) params[0]);
+			paths.add((URL) params[1]);
+		} else return null;
 		
-		File directory = new File(path);
-		directory.mkdir();
-		File file = new File(path+fileName);
-		
-		try {
+		List<File> files = new ArrayList<File>();
+		for (int i = 0; i < urls.size(); i++) {	
+			URL url = urls.get(i);
+			URL p = paths.get(i);
 			
+			String path = Regex.getDirectory(p.getPath());
+			String fileName = Regex.extractFileName(url.toString());
+			
+			File directory = new File(path);
+			directory.mkdir();
+			File file = new File(path+fileName);
+			
+			if (!file.exists())
+				downloadFile(url, file);
+			files.add(file);
+			
+		}
+		
+		return files;
+	}
+
+	@SuppressWarnings("unused")
+	private void downloadFile(URL url, File outputFile) {
+		try {
 			
 			URLConnection connection = url.openConnection();
             connection.connect();
-            // int fileLength = connection.getContentLength();
             
-            
-
             // Download the file
             InputStream input = new BufferedInputStream(url.openStream());
-            OutputStream output = new FileOutputStream(file.getPath());
-
+            FileOutputStream output = new FileOutputStream(outputFile.getPath());
+            
             byte data[] = new byte[1024];
-
-            int count;
-            count = input.read(data);
-            output.write(data, 0, count);
-            //while ((count = input.read(data)) != -1) output.write(data, 0, count);
-
+            
+            int totalBytesRead = 0, incrementalBytesRead = 0;
+            do {
+                int numread = input.read(data);   
+                if (numread <= 0)   
+                    break; 
+                output.write(data, 0, numread);
+                totalBytesRead += numread;
+                incrementalBytesRead += numread;
+            } while(true);
+            
+            input.close();
             output.flush();
             output.close();
-            input.close();
+            
+            
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
-		
-		return file;
 	}
-
+	
 }

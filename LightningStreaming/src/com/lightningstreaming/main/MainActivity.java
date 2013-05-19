@@ -3,7 +3,7 @@ package com.lightningstreaming.main;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
+import java.util.List;
 
 import com.lightningstreaming.R;
 import com.lightningstreaming.asynctask.DownloadPlaylist;
@@ -70,8 +70,14 @@ public class MainActivity extends Activity implements OnClickListener {
 			text.append("Done");
 		}
 		
+		@SuppressWarnings("unchecked")
 		@Override
 		protected Object doInBackground(Object... params) {
+			//List<URL> urls = new ArrayList<URL>();
+			//List<URL> dirs = new ArrayList<URL>();
+			
+			
+			
 			URL url = null;
 			URL dir = null;
 			String input = (String) params[0];
@@ -91,13 +97,14 @@ public class MainActivity extends Activity implements OnClickListener {
 			DownloadPlaylist d = new DownloadPlaylist();
 			d.execute(url,dir);
 			MasterPlaylist playlist = null;
+			List<File> files = null;
 			try {
-				playlist = MasterPlaylist.parse(d.get(), url);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
+				files = (List<File>) d.get();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			playlist = MasterPlaylist.parse(files.get(0), url);
+			
 			playlist.setName("hola");
 			
 			

@@ -49,6 +49,7 @@ public class MasterPlaylist {
 		this.setCurrentSegment(this.getCurrentStream().getMediaSequence());
 	}
 
+	@SuppressWarnings("unchecked")
 	public static MasterPlaylist parse(File file, URL url) {
 		
 		String data = Regex.fileToString(file);
@@ -75,9 +76,14 @@ public class MasterPlaylist {
 			str.remove(0);
 			DownloadPlaylist downloadStreamIndex;
 			
+			List<URL> playlistUrls = new ArrayList<URL>();
+			List<URL> playlistDirs = new ArrayList<URL>();
+			List<Integer> playlistBandwidth = new ArrayList<Integer>();
+			
 			
 			for (int i = 0; i < str.size(); i++) {
 				int bandwidth = Integer.parseInt(Regex.extractString(str.get(i), "BANDWIDTH=", ","));
+				playlistBandwidth.add(bandwidth);
 				URL urlStream = null;
 				String stream = Regex.extractString(str.get(i), "\n", "\n");
 				try {
@@ -87,17 +93,35 @@ public class MasterPlaylist {
 					else urlStream = new URL(stream);
 					
 					String streamPath = file.getPath().replace(file.getName(), stream);
-						
-					downloadStreamIndex = new DownloadPlaylist();
+					
 					URL dir = new URL("file", null, streamPath);
-					downloadStreamIndex.execute(urlStream, dir);
-					sp = SegmentPlaylist.parse(downloadStreamIndex.get(), urlStream);
+					
+					playlistUrls.add(urlStream);
+					playlistDirs.add(dir);
+					
+					
 					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				s.put(bandwidth, sp);
 			}
+			
+			downloadStreamIndex = new DownloadPlaylist();
+			downloadStreamIndex.execute(playlistUrls, playlistDirs);
+			List<File> filesDownloaded = null;
+			try {
+				filesDownloaded = (List<File>) downloadStreamIndex.get();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			for (int i = 0; i < filesDownloaded.size(); i++) {
+				sp = SegmentPlaylist.parse(filesDownloaded.get(i), playlistUrls.get(i));
+				s.put(playlistBandwidth.get(i), sp);
+			}
+			
+			
+			
 		}
 		else {
 			return null;
