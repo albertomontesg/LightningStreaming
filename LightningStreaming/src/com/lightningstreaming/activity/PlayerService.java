@@ -44,6 +44,7 @@ import io.vov.vitamio.utils.VP;
 import io.vov.vitamio.utils.VitamioInstaller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -67,7 +68,6 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 	public static final int STATE_NEED_RESUME = 1;
 	public static final int STATE_STOPPED = 2;
 	public static final int STATE_RINGING = 3;
-	public static final int STATE_BUFFERING = 3;
 
 	private int mLastAudioTrack = -1;
 	private String mLastSubTrack;
@@ -176,17 +176,7 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 
 		try {
 			mPlayer.setScreenOnWhilePlaying(true);
-			//mPlayer.setDataSource(PlayerService.this, mUri);
-			String path = "/mnt/sdcard/LightningStreaming/Segmentos/fileSequenceTotal.ts";
-			//FileInputStream fileInputStream = new FileInputStream(path);
-			//ParcelFileDescriptor pfd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE);
-			//if (fileInputStream.getFD().valid()) Log.d("FileDEscriptor", "File valid");
-			
-			//DownloadSegments ds = new DownloadSegments();
-			//ds.execute(getResources().getString(R.string.app_path));
-			
-			mPlayer.setDataSource(path);
-			
+			mPlayer.setDataSource(PlayerService.this, mUri);
 			if (mLastAudioTrack != -1)
 				mPlayer.setInitialAudioTrack(mLastAudioTrack);
 			if (mLastSubTrackId != -1)
@@ -194,7 +184,11 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 			if (mSurfaceHolder != null && mSurfaceHolder.getSurface() != null && mSurfaceHolder.getSurface().isValid())
 				mPlayer.setDisplay(mSurfaceHolder);
 			mPlayer.prepareAsync();
-		} catch (Exception e) {
+		} catch (IllegalArgumentException e) {
+			Log.e("openVideo", e);
+		} catch (IllegalStateException e) {
+			Log.e("openVideo", e);
+		} catch (IOException e) {
 			Log.e("openVideo", e);
 		}
 	}
@@ -266,13 +260,6 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 		if (mInitialized) {
 			mPlayer.start();
 			setState(STATE_PLAYING);
-		}
-	}
-	
-	public void buffer() {
-		if (mInitialized) {
-			mPlayer.pause();
-			setState(STATE_BUFFERING);
 		}
 	}
 

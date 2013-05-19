@@ -60,7 +60,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lightningstreaming.playlist.MasterPlaylist;
 import com.yixia.zi.provider.Session;
 import com.yixia.zi.utils.BitmapHelper;
 import com.yixia.zi.utils.FileHelper;
@@ -113,15 +112,10 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 
 	private MediaController mMediaController;
 	private PlayerService vPlayer;
-	private DownloadService vDownloader;
 	private ServiceConnection vPlayerServiceConnection;
-	private ServiceConnection vDownloaderServiceConnection;
 	private Animation mLoadingAnimation;
 	private View mLoadingProgressView;
 	private Session mSession;
-	
-	private MasterPlaylist mPlaylist;
-	private String downloadPath;
 
 	static {
 		SCREEN_FILTER.addAction(Intent.ACTION_SCREEN_OFF);
@@ -142,22 +136,6 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 				mServiceConnected = true;
 				if (mSurfaceCreated)
 					vPlayerHandler.sendEmptyMessage(OPEN_FILE);
-			}
-
-			@Override
-			public void onServiceDisconnected(ComponentName name) {
-				vPlayer = null;
-				mServiceConnected = false;
-			}
-		};
-		
-		vDownloaderServiceConnection = new ServiceConnection() {
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				vDownloader = ((DownloadService.LocalBinder) service).getService();
-				mServiceConnected = true;
-				if (mSurfaceCreated)
-					vDownloaderHandler.sendEmptyMessage(OPEN_FILE);
 			}
 
 			@Override
@@ -239,7 +217,6 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 			unbindService(vPlayerServiceConnection);
 			mServiceConnected = false;
 		}
-
 	}
 
 	@Override
@@ -600,16 +577,13 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 					if (!mOpened.get() && vPlayer != null) {
 						mOpened.set(true);
 						vPlayer.setVPlayerListener(vPlayerListener);
-						vDownloader.setDownloaderListener(downloaderListener);
 						if (vPlayer.isInitialized())
 							mUri = vPlayer.getUri();
 
 						if (mVideoView != null)
 							vPlayer.setDisplay(mVideoView.getHolder());
-						if (mUri != null) {
+						if (mUri != null)
 							vPlayer.initialize(mUri, mDisplayName, mSaveUri, getStartPosition(), vPlayerListener, mParentId, mIsHWCodec);
-							vDownloader.initialize(mPlaylist, downloadPath);
-						}
 					}
 				}
 				break;
@@ -664,20 +638,6 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 			}
 		}
 	};
-	
-	private Handler vDownloaderHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case OPEN_FILE:
-				
-			case OPEN_START:
-				mVideoLoadingText.setText(R.string.video_layout_loading);
-				setVideoLoadingLayoutVisibility(View.VISIBLE);
-				break;
-			}
-		}
-	};
 
 	private void setVideoLoadingLayoutVisibility(int visibility) {
 		if (mVideoLoadingLayout != null && mLoadingProgressView != null) {
@@ -687,29 +647,6 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		}
 	}
 
-	private DownloadService.DownloaderListener downloaderListener = new DownloadService.DownloaderListener() {
-		
-		@Override
-		public void onPlay() {
-			
-		}
-		
-		@Override
-		public void onBuffering() {
-			
-		}
-
-		@Override
-		public void onPrepared() {
-			
-		}
-
-		@Override
-		public void onChangeSegment() {
-			
-		}
-	};
-	
 	private PlayerService.VPlayerListener vPlayerListener = new PlayerService.VPlayerListener() {
 		@Override
 		public void onHWRenderFailed() {
