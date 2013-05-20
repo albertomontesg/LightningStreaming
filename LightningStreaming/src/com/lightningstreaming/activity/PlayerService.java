@@ -76,6 +76,7 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 	private long mMediaId = -1l;
 	
 	private MasterPlaylist mPlaylist;
+	private boolean wasPlaying = true;
 	
 	public class LocalBinder extends Binder {
 		public PlayerService getService() {
@@ -454,7 +455,7 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 
 		public void onOpenStart();
 
-		public void onOpenSuccess();
+		public void onOpenSuccess(boolean wasPlaying);
 
 		public void onOpenFailed();
 
@@ -511,7 +512,7 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 		if (!mFromNotification && mSeekTo > 0 && mSeekTo < 1)
 			seekTo(mSeekTo);
 		mSeekTo = -1;
-		mListener.onOpenSuccess();
+		mListener.onOpenSuccess(wasPlaying);
 		if (!mFromNotification) {
 			setSubEncoding(VP.DEFAULT_SUB_ENCODING);
 			if (mUri != null)
@@ -559,6 +560,7 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 				mListener.onBufferStart();
 			else
 				mPlayer.pause();
+			//if (getCurrentPosition() > 100 && !mPlaylist.isMinimumQuality()) reduceQuality();
 			break;
 		case MediaPlayer.MEDIA_INFO_BUFFERING_END:
 			if (mListener != null)
@@ -596,14 +598,31 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 	/**
 	 * Allows to change the URL of the stream it's being reproducing adapting to the current network state
 	 */
-	public void changeQuality () {
+	public void reduceQuality () {
+		wasPlaying = isPlaying();	
 		stop();
-		float currentPosition = (float) getCurrentPosition()/getDuration();
+		float currentPosition = (float) (getCurrentPosition())/getDuration();
 		mPlaylist.decreaseQuality();
 		mUri = Uri.parse(mPlaylist.getStream(mPlaylist.getCurrentQuality()).getUrl().toString());
 		
 		mSeekTo = currentPosition;
 		openVideo();
+	}
+	
+	public void increaseQuality() {
+		wasPlaying = isPlaying();		
+		stop();
+		float currentPosition = (float) (getCurrentPosition())/getDuration();
+		mPlaylist.increaseQuality();
+		mUri = Uri.parse(mPlaylist.getStream(mPlaylist.getCurrentQuality()).getUrl().toString());
+		
+		mSeekTo = currentPosition;
+		openVideo();
+	}
+	
+	
+	public MasterPlaylist getPlaylist() {
+		return mPlaylist;
 	}
 
 }

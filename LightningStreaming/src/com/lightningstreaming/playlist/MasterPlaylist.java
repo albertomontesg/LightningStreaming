@@ -258,4 +258,33 @@ public class MasterPlaylist {
 		int minimumQuality = getQualities().get(0);
 		setCurrentQuality(minimumQuality);
 	}
+	
+	public boolean isMaximumQuality() {
+		return currentQuality == getMaximumQuality();
+	}
+	
+	public boolean isMinimumQuality() {
+		return currentQuality == getMinimumQuality();
+	}
+	
+	public int getUpperQualityLimit() {
+		if (isMaximumQuality())
+			return Integer.MAX_VALUE;
+		else {
+			int q = getCurrentQuality();
+			int up = getQualities().get(getQualities().indexOf(q)+1);
+			return (q+up)/2;
+		}	
+	}
+	
+	public int getLowerQualityLimit() {
+		if (isMinimumQuality())
+			return Integer.MIN_VALUE;
+		else {
+			int q = getCurrentQuality();
+			int down = getQualities().get(getQualities().indexOf(q)-1);
+			return (q+down)/2;
+		}	
+	}
+	
 }

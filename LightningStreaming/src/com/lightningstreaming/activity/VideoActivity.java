@@ -42,6 +42,8 @@ import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -76,6 +78,9 @@ import com.yixia.zi.utils.UIUtils;
 public class VideoActivity extends Activity implements MediaController.MediaPlayerControl, VideoView.SurfaceCallback {
 	
 	public static final int RESULT_FAILED = -7;
+	public static final int NO_INTERNET_CONNECTION = -5;
+	public static final int HI_COUNT = 4;
+	public static final int LOW_COUNT = - HI_COUNT;
 	
 	private static final IntentFilter USER_PRESENT_FILTER = new IntentFilter(Intent.ACTION_USER_PRESENT);
 	private static final IntentFilter SCREEN_FILTER = new IntentFilter(Intent.ACTION_SCREEN_ON);
@@ -120,6 +125,8 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	private Session mSession;
 	
 	private MasterPlaylist mPlaylist;
+	private int count = 0;
+	private boolean wasPlaying = true;
 
 	static {
 		SCREEN_FILTER.addAction(Intent.ACTION_SCREEN_OFF);
@@ -131,7 +138,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this))
 			return;
-
+		
 		mSession = new Session(this);
 		vPlayerServiceConnection = new ServiceConnection() {
 			@Override
@@ -155,6 +162,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		manageReceivers();
 
 		mCreated = true;
+		
 	}
 
 	private void attachMediaController() {
@@ -279,43 +287,55 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	}
 
 	private void parseIntent(Intent i) {
-
-		Uri dat = IntentHelper.getIntentUri(i);
-		if (dat == null)
-			resultFinish(RESULT_FAILED);
-
-		String datString = dat.toString();
-		if (!datString.equals(dat.toString()))
-			dat = Uri.parse(datString);
-
-		
-		File index = new File(dat.toString());
-		try {
-			mUrlPlaylist = new URL(i.getStringExtra("UrlPlaylist"));
-			setmPlaylist(MasterPlaylist.parse(index, mUrlPlaylist));
-			
-			if (!mPlaylist.isOnlySegmentPlaylist()) {
-				mPlaylist.setMaximumQuality();
-				Log.i("Quality", "Setted the maximum quality");
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
+		// Check the connectivity available to play or not the video depending on the settings
+		ConnectivityManager cm = (ConnectivityManager)this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+		boolean isConnected = false, isWiFi = false;
+		if (activeNetwork != null) {
+			isConnected = activeNetwork.isConnectedOrConnecting();
+			isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 		}
-
-		mUri = Uri.parse(mPlaylist.getCurrentStream().getUrl().toString());
 		
-		mNeedLock = i.getBooleanExtra("lockScreen", false);
-		mDisplayName = i.getStringExtra("displayName");
-		mFromStart = i.getBooleanExtra("fromStart", false);
-		mSaveUri = i.getBooleanExtra("saveUri", true);
-		mStartPos = i.getFloatExtra("startPosition", -1.0f);
-		mLoopCount = i.getIntExtra("loopCount", 1);
-		mParentId = i.getIntExtra("parentId", 0);
-		mSubPath = i.getStringExtra("subPath");
-		mSubShown = i.getBooleanExtra("subShown", true);
-		mIsHWCodec = i.getBooleanExtra("hwCodec", false);
-		Log.i("L: %b, N: %s, S: %b, P: %f, LP: %d", mNeedLock, mDisplayName, mFromStart, mStartPos, mLoopCount);
+		Uri dat = IntentHelper.getIntentUri(i);
+		if (dat == null) {
+			resultFinish(RESULT_FAILED);
+		} else if (!isConnected || !isWiFi) {
+			resultFinish(NO_INTERNET_CONNECTION);
+		} else {
+			String datString = dat.toString();
+			if (!datString.equals(dat.toString()))
+				dat = Uri.parse(datString);
+
+			
+			File index = new File(dat.toString());
+			try {
+				mUrlPlaylist = new URL(i.getStringExtra("UrlPlaylist"));
+				setmPlaylist(MasterPlaylist.parse(index, mUrlPlaylist));
+				
+				if (!mPlaylist.isOnlySegmentPlaylist()) {
+					mPlaylist.setMaximumQuality();
+					Log.i("Quality", "Setted the maximum quality");
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			mUri = Uri.parse(mPlaylist.getCurrentStream().getUrl().toString());
+			
+			mNeedLock = i.getBooleanExtra("lockScreen", false);
+			mDisplayName = i.getStringExtra("displayName");
+			mFromStart = i.getBooleanExtra("fromStart", false);
+			mSaveUri = i.getBooleanExtra("saveUri", true);
+			mStartPos = i.getFloatExtra("startPosition", -1.0f);
+			mLoopCount = i.getIntExtra("loopCount", 1);
+			mParentId = i.getIntExtra("parentId", 0);
+			mSubPath = i.getStringExtra("subPath");
+			mSubShown = i.getBooleanExtra("subShown", true);
+			mIsHWCodec = i.getBooleanExtra("hwCodec", false);
+			Log.i("L: %b, N: %s, S: %b, P: %f, LP: %d", mNeedLock, mDisplayName, mFromStart, mStartPos, mLoopCount);
+		}
+		
 	}
 
 	private void manageReceivers() {
@@ -363,7 +383,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	private void applyResult(int resultCode) {
 		vPlayerHandler.removeMessages(BUFFER_PROGRESS);
 		Intent i = new Intent();
-		i.putExtra("filePath", mUri.toString());
+		if (mUri != null) i.putExtra("filePath", mUri.toString());
 		if (isInitialized()) {
 			i.putExtra("position", (double) vPlayer.getCurrentPosition() / vPlayer.getDuration());
 			i.putExtra("duration", vPlayer.getDuration());
@@ -372,6 +392,9 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		switch (resultCode) {
 		case RESULT_FAILED:
 			ToastHelper.showToast(this, Toast.LENGTH_LONG, R.string.video_cannot_play);
+			break;
+		case NO_INTERNET_CONNECTION:
+			ToastHelper.showToast(this, Toast.LENGTH_LONG, R.string.not_internet_connection);
 			break;
 		case RESULT_CANCELED:
 		case RESULT_OK:
@@ -382,7 +405,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 
 	private void resultFinish(int resultCode) {
 		applyResult(resultCode);
-		if (UIUtils.hasICS() && resultCode != RESULT_FAILED) {
+		if (UIUtils.hasICS() && resultCode != RESULT_FAILED && resultCode != NO_INTERNET_CONNECTION) {
 			android.os.Process.killProcess(android.os.Process.myPid());
 		} else {
 			finish();
@@ -583,9 +606,10 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	private static final int BUFFER_START = 11;
 	private static final int BUFFER_PROGRESS = 12;
 	private static final int BUFFER_COMPLETE = 13;
-	private static final int REDUCE_QUALITY = 14;
 	private static final int CLOSE_START = 21;
 	private static final int CLOSE_COMPLETE = 22;
+	private static final int REDUCE_QUALITY = 31;
+	private static final int INCREASE_QUALITY = 32;
 	private static final int SUBTITLE_TEXT = 0;
 	private static final int SUBTITLE_BITMAP = 1;
 	private Handler vPlayerHandler = new Handler() {
@@ -603,8 +627,8 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 						if (mVideoView != null)
 							vPlayer.setDisplay(mVideoView.getHolder());
 						if (mUri != null) {
-							Uri uriPlaylist = Uri.parse(mUrlPlaylist.toString());
-							vPlayer.initialize(uriPlaylist, mPlaylist, mDisplayName, mSaveUri, getStartPosition(), vPlayerListener, mParentId, mIsHWCodec);
+							//Uri uriPlaylist = Uri.parse(mUrlPlaylist.toString());
+							vPlayer.initialize(mUri, mPlaylist, mDisplayName, mSaveUri, getStartPosition(), vPlayerListener, mParentId, mIsHWCodec);
 						}
 					}
 				}
@@ -617,7 +641,8 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 				loadVPlayerPrefs();
 				setVideoLoadingLayoutVisibility(View.GONE);
 				setVideoLayout();
-				vPlayer.start();
+				if (wasPlaying)
+					vPlayer.start();
 				attachMediaController();
 				break;
 			case OPEN_FAILED:
@@ -632,7 +657,6 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 					setVideoLoadingLayoutVisibility(View.GONE);
 				} else {
 					mVideoLoadingText.setText(getString(R.string.video_layout_buffering_progress, vPlayer.getBufferProgress()));
-					vPlayerHandler.sendEmptyMessage(REDUCE_QUALITY);
 					vPlayerHandler.sendEmptyMessageDelayed(BUFFER_PROGRESS, 1000);
 					stopPlayer();
 				}
@@ -642,8 +666,16 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 				vPlayerHandler.removeMessages(BUFFER_PROGRESS);
 				break;
 			case REDUCE_QUALITY:
-				Log.i("Quality", "Quality reduced");
-				vPlayer.changeQuality();
+				if (!vPlayer.getPlaylist().isMinimumQuality()) {
+					Log.i("Quality", "Quality reduced");
+					vPlayer.reduceQuality();
+				}
+				break;
+			case INCREASE_QUALITY:
+				if (!vPlayer.getPlaylist().isMaximumQuality()) {
+					Log.i("Quality", "Quality increase");
+					vPlayer.increaseQuality();
+				}
 				break;
 			case CLOSE_START:
 				mVideoLoadingText.setText(R.string.closing_file);
@@ -711,7 +743,8 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		}
 
 		@Override
-		public void onOpenSuccess() {
+		public void onOpenSuccess(boolean b) {
+			wasPlaying = b;
 			vPlayerHandler.sendEmptyMessage(OPEN_SUCCESS);
 		}
 
@@ -767,8 +800,20 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 			//!Media.isNative(mUri.toString())
 			if (mMediaController != null) {
 				mMediaController.setDownloadRate(String.format("%dKB/s", kbPerSec));
-				if (!mPlaylist.isOnlySegmentPlaylist() && mPlaylist.getCurrentQuality()/1000 > kbPerSec && mPlaylist.getMinimumQuality()/1000 < kbPerSec && !vPlayer.isPlaying()) {
-					//vPlayerHandler.sendEmptyMessage(REDUCE_QUALITY);
+				wasPlaying = vPlayer.isPlaying();
+				if (!mPlaylist.isOnlySegmentPlaylist()) {
+					if (mPlaylist.getUpperQualityLimit()/1000 <= (kbPerSec)) {
+						count++;
+					} else if (mPlaylist.getLowerQualityLimit()/1000 > (kbPerSec)) {
+						count--;
+					}
+					if (count > HI_COUNT) {
+						count = 0;
+						vPlayer.increaseQuality();
+					} else if (count < LOW_COUNT) {
+						count = 0;
+						vPlayer.reduceQuality();
+					}
 				}
 			}
 		}
@@ -841,8 +886,9 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 
 	@Override
 	public void start() {
-		if (isInitialized())
+		if (isInitialized()) {
 			vPlayer.start();
+		}
 	}
 
 	@Override
@@ -972,4 +1018,6 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	public void setmPlaylist(MasterPlaylist mPlaylist) {
 		this.mPlaylist = mPlaylist;
 	}
+	
+	
 }
