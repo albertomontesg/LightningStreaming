@@ -15,6 +15,7 @@ import com.lightningstreaming.playlist.MasterPlaylist;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.Menu;
@@ -41,14 +42,15 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			@Override
 			public void onClick(View v) {
-				//String url = "file:/mnt/sdcard/LightningStreaming/Segmentos/fileSequenceTotal.ts";
+				String path = "mnt/sdcard/LightningStreaming/MasterPlaylist/bipbopall.m3u8";
 				String url = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
+				//String url = "http://devimages.apple.com/iphone/samples/bipbop/gear4/prog_index.m3u8";
 				//String url = "http://meta.video.qiyi.com/255/dfbdc129b8d18e10d6c593ed44fa6df9.m3u8";
 				//String url = "http://3glivehntv.doplive.com.cn/video1/index_128k.m3u8";
 				//String url = "file:/mnt/sdcard/LightningStreaming/Segmentos/fileSequence0.ts";
 				String nameVideo = "Marco";
 				Intent i = new Intent(getApplicationContext(), VideoActivity.class);
-				i.setData(Uri.parse(url));
+				i.setData(Uri.parse(path));
 				i.putExtra("displayName", nameVideo);
 				i.putExtra("UrlPlaylist", url);
 
@@ -74,7 +76,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	});
 		
-		File directory = new File(getResources().getString(R.string.app_path));
+		File directory = new File(Environment.getExternalStorageDirectory() + getResources().getString(R.string.app_path));
 		directory.mkdirs();
 		
 	}
@@ -91,8 +93,19 @@ public class MainActivity extends Activity implements OnClickListener {
 			TextView text = (TextView) findViewById(R.id.textView1);
 			text.setText("Downloading SegmentPlaylist...");
 			
-			PressedButton pressedAction = new PressedButton();
-			pressedAction.execute("S");
+			URL url = null, dir = null;
+			try {
+				url = new URL("http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8");
+				dir = new URL("file", null, Environment.getExternalStorageDirectory() + "/LightningStreaming/SegmentPlaylist/");
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+			DownloadPlaylist d = new DownloadPlaylist();
+			d.execute(url,dir);
+			
+			
+			//PressedButton pressedAction = new PressedButton();
+			//pressedAction.execute("S");
 		}
 	};
 	
@@ -101,8 +114,18 @@ public class MainActivity extends Activity implements OnClickListener {
 			TextView text = (TextView) findViewById(R.id.textView1);
 			text.setText("Downloading MasterPlaylist...");
 			
-			PressedButton pressedAction = new PressedButton();
-			pressedAction.execute("M");
+			URL url = null, dir = null;
+			try {
+				url = new URL("http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8");
+				dir = new URL("file", null, Environment.getExternalStorageDirectory() + "/LightningStreaming/MasterPlaylist/");
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			DownloadPlaylist d = new DownloadPlaylist();
+			d.execute(url,dir);
+			
+			//PressedButton pressedAction = new PressedButton();
+			//pressedAction.execute("M");
 		}
 	};
 
@@ -129,10 +152,10 @@ public class MainActivity extends Activity implements OnClickListener {
 			try {
 				if (input.contentEquals("M")) {
 					url = new URL("http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8");
-					dir = new URL("file", null, getResources().getString(R.string.app_path)+"MasterPlaylist/");
+					dir = new URL("file", null, Environment.getExternalStorageDirectory() + "/LightningStreaming/MasterPlaylist/");
 				} else {
 					url = new URL("http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8");
-					dir = new URL("file", null, getResources().getString(R.string.app_path)+"SegmentPlaylist/");
+					dir = new URL("file", null, Environment.getExternalStorageDirectory() + "/LightningStreaming/SegmentPlaylist/");
 				}
 			} catch (MalformedURLException e) {
 				e.printStackTrace();

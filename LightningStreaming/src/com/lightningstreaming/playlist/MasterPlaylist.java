@@ -235,9 +235,27 @@ public class MasterPlaylist {
 	}
 
 	public void setCurrentQuality(int currentQuality) {
-		this.currentQuality = currentQuality;
-		if (qualities.contains(currentQuality))
+		if (qualities.contains(currentQuality)) {
+			this.currentQuality = currentQuality;
 			this.currentStream = streams.get(currentQuality);
+		}
 	}
 	
+	public int getMaximumQuality() {
+		return getQualities().get(getQualities().size()-1);
+	}
+	
+	public int getMinimumQuality() {
+		return getQualities().get(0);
+	}
+	
+	public void setMaximumQuality() {
+		int maximumQuality = getQualities().get(getQualities().size()-1);
+		setCurrentQuality(maximumQuality);
+	}
+	
+	public void setMinimumQuality() {
+		int minimumQuality = getQualities().get(0);
+		setCurrentQuality(minimumQuality);
+	}
 }

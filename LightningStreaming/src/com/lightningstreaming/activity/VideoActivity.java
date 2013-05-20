@@ -23,6 +23,7 @@ import io.vov.vitamio.widget.OutlineTextView;
 import io.vov.vitamio.widget.VideoView;
 
 import java.io.File;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -60,13 +61,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lightningstreaming.playlist.MasterPlaylist;
 import com.yixia.zi.provider.Session;
 import com.yixia.zi.utils.BitmapHelper;
 import com.yixia.zi.utils.FileHelper;
 import com.yixia.zi.utils.FileUtils;
 import com.yixia.zi.utils.IntentHelper;
 import com.yixia.zi.utils.Log;
-import com.yixia.zi.utils.Media;
 import com.yixia.zi.utils.StringHelper;
 import com.yixia.zi.utils.ToastHelper;
 import com.yixia.zi.utils.UIUtils;
@@ -101,6 +102,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	private OutlineTextView mSubtitleText;
 	private ImageView mSubtitleImage;
 	private Uri mUri;
+	private URL mUrlPlaylist;
 	private ScreenReceiver mScreenReceiver;
 	private HeadsetPlugReceiver mHeadsetPlugReceiver;
 	private UserPresentReceiver mUserPresentReceiver;
@@ -116,6 +118,8 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	private Animation mLoadingAnimation;
 	private View mLoadingProgressView;
 	private Session mSession;
+	
+	private MasterPlaylist mPlaylist;
 
 	static {
 		SCREEN_FILTER.addAction(Intent.ACTION_SCREEN_OFF);
@@ -284,8 +288,23 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		if (!datString.equals(dat.toString()))
 			dat = Uri.parse(datString);
 
-		mUri = dat;
+		
+		File index = new File(dat.toString());
+		try {
+			mUrlPlaylist = new URL(i.getStringExtra("UrlPlaylist"));
+			setmPlaylist(MasterPlaylist.parse(index, mUrlPlaylist));
+			
+			if (!mPlaylist.isOnlySegmentPlaylist()) {
+				mPlaylist.setMaximumQuality();
+				Log.i("Quality", "Setted the maximum quality");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
+		mUri = Uri.parse(mPlaylist.getCurrentStream().getUrl().toString());
+		
 		mNeedLock = i.getBooleanExtra("lockScreen", false);
 		mDisplayName = i.getStringExtra("displayName");
 		mFromStart = i.getBooleanExtra("fromStart", false);
@@ -564,6 +583,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	private static final int BUFFER_START = 11;
 	private static final int BUFFER_PROGRESS = 12;
 	private static final int BUFFER_COMPLETE = 13;
+	private static final int REDUCE_QUALITY = 14;
 	private static final int CLOSE_START = 21;
 	private static final int CLOSE_COMPLETE = 22;
 	private static final int SUBTITLE_TEXT = 0;
@@ -582,8 +602,10 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 
 						if (mVideoView != null)
 							vPlayer.setDisplay(mVideoView.getHolder());
-						if (mUri != null)
-							vPlayer.initialize(mUri, mDisplayName, mSaveUri, getStartPosition(), vPlayerListener, mParentId, mIsHWCodec);
+						if (mUri != null) {
+							Uri uriPlaylist = Uri.parse(mUrlPlaylist.toString());
+							vPlayer.initialize(uriPlaylist, mPlaylist, mDisplayName, mSaveUri, getStartPosition(), vPlayerListener, mParentId, mIsHWCodec);
+						}
 					}
 				}
 				break;
@@ -610,6 +632,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 					setVideoLoadingLayoutVisibility(View.GONE);
 				} else {
 					mVideoLoadingText.setText(getString(R.string.video_layout_buffering_progress, vPlayer.getBufferProgress()));
+					vPlayerHandler.sendEmptyMessage(REDUCE_QUALITY);
 					vPlayerHandler.sendEmptyMessageDelayed(BUFFER_PROGRESS, 1000);
 					stopPlayer();
 				}
@@ -617,6 +640,10 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 			case BUFFER_COMPLETE:
 				setVideoLoadingLayoutVisibility(View.GONE);
 				vPlayerHandler.removeMessages(BUFFER_PROGRESS);
+				break;
+			case REDUCE_QUALITY:
+				Log.i("Quality", "Quality reduced");
+				vPlayer.changeQuality();
 				break;
 			case CLOSE_START:
 				mVideoLoadingText.setText(R.string.closing_file);
@@ -737,8 +764,12 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 
 		@Override
 		public void onDownloadRateChanged(int kbPerSec) {
-			if (!Media.isNative(mUri.toString()) && mMediaController != null) {
+			//!Media.isNative(mUri.toString())
+			if (mMediaController != null) {
 				mMediaController.setDownloadRate(String.format("%dKB/s", kbPerSec));
+				if (!mPlaylist.isOnlySegmentPlaylist() && mPlaylist.getCurrentQuality()/1000 > kbPerSec && mPlaylist.getMinimumQuality()/1000 < kbPerSec && !vPlayer.isPlaying()) {
+					//vPlayerHandler.sendEmptyMessage(REDUCE_QUALITY);
+				}
 			}
 		}
 
@@ -932,5 +963,13 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 			if (vPlayer.needResume())
 				vPlayer.start();
 		}
+	}
+
+	public MasterPlaylist getmPlaylist() {
+		return mPlaylist;
+	}
+
+	public void setmPlaylist(MasterPlaylist mPlaylist) {
+		this.mPlaylist = mPlaylist;
 	}
 }

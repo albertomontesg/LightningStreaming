@@ -15,7 +15,7 @@ import android.os.AsyncTask;
 
 public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Object doInBackground(Object... params) {
 		List<URL> urls = new ArrayList<URL>();
@@ -42,7 +42,6 @@ public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
 			File directory = new File(path);
 			directory.mkdir();
 			File file = new File(path+fileName);
-			
 			
 			if (!file.exists())
 				successDownload = downloadFile(url, file);

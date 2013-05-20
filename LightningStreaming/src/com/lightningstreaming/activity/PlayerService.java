@@ -27,6 +27,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.SurfaceHolder;
 
+import com.lightningstreaming.playlist.MasterPlaylist;
 import com.yixia.zi.utils.FileHelper;
 import com.yixia.zi.utils.Log;
 
@@ -73,7 +74,9 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 	private String mLastSubTrack;
 	private int mLastSubTrackId = -1;
 	private long mMediaId = -1l;
-
+	
+	private MasterPlaylist mPlaylist;
+	
 	public class LocalBinder extends Binder {
 		public PlayerService getService() {
 			return PlayerService.this;
@@ -140,12 +143,13 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 		return mInitialized;
 	}
 
-	public boolean initialize(Uri filePath, String displayName, boolean saveUri, float startPos, VPlayerListener listener, int parentId, boolean isHWCodec) {
+	public boolean initialize(Uri filePath, MasterPlaylist playlist, String displayName, boolean saveUri, float startPos, VPlayerListener listener, int parentId, boolean isHWCodec) {
 		if (mPlayer == null)
 			vplayerInit(isHWCodec);
 		mListener = listener;
 		mOldUri = mUri;
 		mUri = filePath;
+		mPlaylist = playlist;
 		mSeekTo = startPos;
 		mMediaId = -1;
 		mLastAudioTrack = -1;
@@ -387,6 +391,7 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 		if (mInitialized)
 			mPlayer.setSubShown(shown);
 	}
+	
 	protected boolean isBuffering() {
 		return (mInitialized && mPlayer.isBuffering());
 	}
@@ -587,6 +592,18 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 			return null;
 		else
 			return files.toArray(new String[files.size()]);
+	}
+	/**
+	 * Allows to change the URL of the stream it's being reproducing adapting to the current network state
+	 */
+	public void changeQuality () {
+		stop();
+		float currentPosition = (float) getCurrentPosition()/getDuration();
+		mPlaylist.decreaseQuality();
+		mUri = Uri.parse(mPlaylist.getStream(mPlaylist.getCurrentQuality()).getUrl().toString());
+		
+		mSeekTo = currentPosition;
+		openVideo();
 	}
 
 }
