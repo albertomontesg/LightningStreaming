@@ -78,8 +78,8 @@ import com.yixia.zi.utils.UIUtils;
 public class VideoActivity extends Activity implements MediaController.MediaPlayerControl, VideoView.SurfaceCallback {
 	
 	public static final int RESULT_FAILED = -7;
-	public static final int NO_INTERNET_CONNECTION = -5;
-	public static final int HI_COUNT = 4;
+	public static final int NO_INTERNET_CONNECTION = -11;
+	public static final int HI_COUNT = 5;
 	public static final int LOW_COUNT = - HI_COUNT;
 	
 	private static final IntentFilter USER_PRESENT_FILTER = new IntentFilter(Intent.ACTION_USER_PRESENT);
@@ -157,8 +157,8 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		};
 
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-		parseIntent(getIntent());
 		loadView(R.layout.activity_video);
+		parseIntent(getIntent());
 		manageReceivers();
 
 		mCreated = true;
@@ -302,40 +302,46 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		} else if (!isConnected || !isWiFi) {
 			resultFinish(NO_INTERNET_CONNECTION);
 		} else {
-			String datString = dat.toString();
-			if (!datString.equals(dat.toString()))
-				dat = Uri.parse(datString);
-
+			vPlayerHandler.sendEmptyMessage(PARSING_START);
 			
-			File index = new File(dat.toString());
-			try {
-				mUrlPlaylist = new URL(i.getStringExtra("UrlPlaylist"));
-				setmPlaylist(MasterPlaylist.parse(index, mUrlPlaylist));
-				
-				if (!mPlaylist.isOnlySegmentPlaylist()) {
-					mPlaylist.setMaximumQuality();
-					Log.i("Quality", "Setted the maximum quality");
-				}
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			parseIndex(i);
+		}	
+	}
+	
+	private void parseIndex(Intent i) {
+		Uri dat = IntentHelper.getIntentUri(i);
+		String datString = dat.toString();
+		if (!datString.equals(dat.toString()))
+			dat = Uri.parse(datString);
 
-			mUri = Uri.parse(mPlaylist.getCurrentStream().getUrl().toString());
-			
-			mNeedLock = i.getBooleanExtra("lockScreen", false);
-			mDisplayName = i.getStringExtra("displayName");
-			mFromStart = i.getBooleanExtra("fromStart", false);
-			mSaveUri = i.getBooleanExtra("saveUri", true);
-			mStartPos = i.getFloatExtra("startPosition", -1.0f);
-			mLoopCount = i.getIntExtra("loopCount", 1);
-			mParentId = i.getIntExtra("parentId", 0);
-			mSubPath = i.getStringExtra("subPath");
-			mSubShown = i.getBooleanExtra("subShown", true);
-			mIsHWCodec = i.getBooleanExtra("hwCodec", false);
-			Log.i("L: %b, N: %s, S: %b, P: %f, LP: %d", mNeedLock, mDisplayName, mFromStart, mStartPos, mLoopCount);
-		}
 		
+		File index = new File(dat.toString());
+		try {
+			mUrlPlaylist = new URL(i.getStringExtra("UrlPlaylist"));
+			setmPlaylist(MasterPlaylist.parse(index, mUrlPlaylist));
+			
+			if (!mPlaylist.isOnlySegmentPlaylist()) {
+				mPlaylist.setMaximumQuality();
+				Log.i("Quality", "Setted the maximum quality");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		mUri = Uri.parse(mPlaylist.getCurrentStream().getUrl().toString());
+		
+		mNeedLock = i.getBooleanExtra("lockScreen", false);
+		mDisplayName = i.getStringExtra("displayName");
+		mFromStart = i.getBooleanExtra("fromStart", false);
+		mSaveUri = i.getBooleanExtra("saveUri", true);
+		mStartPos = i.getFloatExtra("startPosition", -1.0f);
+		mLoopCount = i.getIntExtra("loopCount", 1);
+		mParentId = i.getIntExtra("parentId", 0);
+		mSubPath = i.getStringExtra("subPath");
+		mSubShown = i.getBooleanExtra("subShown", true);
+		mIsHWCodec = i.getBooleanExtra("hwCodec", false);
+		Log.i("L: %b, N: %s, S: %b, P: %f, LP: %d", mNeedLock, mDisplayName, mFromStart, mStartPos, mLoopCount);
 	}
 
 	private void manageReceivers() {
@@ -603,6 +609,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	private static final int OPEN_FAILED = 3;
 	private static final int HW_FAILED = 4;
 	private static final int LOAD_PREFS = 5;
+	private static final int PARSING_START = 6;
 	private static final int BUFFER_START = 11;
 	private static final int BUFFER_PROGRESS = 12;
 	private static final int BUFFER_COMPLETE = 13;
@@ -632,6 +639,10 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 						}
 					}
 				}
+				break;
+			case PARSING_START:
+				mVideoLoadingText.setText(R.string.parsing_index);
+				setVideoLoadingLayoutVisibility(View.VISIBLE);
 				break;
 			case OPEN_START:
 				mVideoLoadingText.setText(R.string.video_layout_loading);
