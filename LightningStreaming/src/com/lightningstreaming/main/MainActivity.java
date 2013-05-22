@@ -1,7 +1,10 @@
 package com.lightningstreaming.main;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -16,13 +19,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		try {
-			wait(3000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		Intent i = new Intent(this, VideoListActivity.class);
-		startActivity(i);
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		Tasca t= new Tasca();
+		t.execute((Object[])null);
 		
 		// Connectiong to the server and parse the html
 		
@@ -42,5 +42,33 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		
+	}
+	
+	class Tasca extends AsyncTask<Object, Integer, Object>{
+		
+		protected void onPostExecute(Object[] result){
+			Intent newi = new Intent(MainActivity.this, VideoListActivity.class);
+			//passar result
+			startActivity(newi);
+		 }
+		
+		@Override
+		protected Object doInBackground(Object... arg0) {
+			Connection c=null;
+		    try {
+				c=new Connection(null);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		    try {
+				c.Connect();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		    Object[] o=new Object[2];
+		    o[0]=c.name;
+		    o[1]=c.urls;
+		    return o;
+		}
 	}
 }
