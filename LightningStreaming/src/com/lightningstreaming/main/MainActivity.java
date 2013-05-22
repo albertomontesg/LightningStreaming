@@ -24,6 +24,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		Intent i = new Intent(this, VideoListActivity.class);
 		startActivity(i);
 		
+		// Connectiong to the server and parse the html
+		
+		// change the textview content to (getting_index) and download the m3u8 of all the videos
+		
+		// Then pass the information to the video list activity.
+		
 	}
 
 	@Override
