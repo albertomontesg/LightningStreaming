@@ -34,4 +34,3 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 	}
 }
-

@@ -4,6 +4,8 @@ import android.app.ListActivity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
+import android.widget.ListView;
 import android.support.v4.app.*;
 import android.support.v4.content.Loader;
 
@@ -25,6 +27,12 @@ public class VideoListActivity extends ListActivity implements LoaderManager.Loa
 	}
 
 	@Override
+	public void onBackPressed() {
+		// TODO Make that when back pressed it goes out of the app and not to the main activity. Main activity only is when start. 
+		// Allows to refresh the list inside the app.
+	}
+	
+	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		// Now create and return a CursorLoader that will take care of
         // creating a Cursor for the data being displayed.
@@ -41,10 +49,9 @@ public class VideoListActivity extends ListActivity implements LoaderManager.Loa
 		
 	}
 
-	@Override
-	public void onBackPressed() {
-		// TODO Make that when back pressed it goes out of the app and not to the main activity. Main activity only is when start. 
-		// Allows to refresh the list inside the app.
-	}
+	@Override 
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        // Do something when a list item is clicked
+    }
 
 }
