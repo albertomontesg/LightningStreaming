@@ -2,7 +2,7 @@ package com.lightningstreaming.exceptions;
 
 import android.util.Log;
 
-public class CouldNotDownloadFilesException extends Exception {
+public class CouldNotDownloadFilesException extends ParsingException {
 
 	/**
 	 * 

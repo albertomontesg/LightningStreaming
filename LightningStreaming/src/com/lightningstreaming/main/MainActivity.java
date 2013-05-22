@@ -9,7 +9,7 @@ import com.lightningstreaming.R;
 import com.lightningstreaming.activity.VideoActivity;
 import com.lightningstreaming.asynctask.DownloadPlaylist;
 import com.lightningstreaming.asynctask.DownloadSegments;
-import com.lightningstreaming.exceptions.CouldNotDownloadFilesException;
+import com.lightningstreaming.exceptions.ParsingException;
 import com.lightningstreaming.playlist.MasterPlaylist;
 
 import android.net.Uri;
@@ -174,7 +174,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				try {
 					playlist = MasterPlaylist.parse(files.get(0), url);
 					playlist.setName("hola");
-				} catch (CouldNotDownloadFilesException e) {
+				} catch (ParsingException e) {
 					e.printStackTrace();
 				}
 			}
@@ -185,7 +185,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
 		
 	}
 }

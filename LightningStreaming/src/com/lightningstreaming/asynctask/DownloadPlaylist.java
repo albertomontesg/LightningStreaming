@@ -13,32 +13,22 @@ import com.lightningstreaming.regex.Regex;
 
 import android.os.AsyncTask;
 
-<<<<<<< HEAD
 /**
  * AsyncTask that Downloads a Playlist from an URL and save it on a specific directory
  * @author Alberto Montes
  *
  */
-public class DownloadPlaylist extends AsyncTask<URL, Integer, File>{
-=======
+
 public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
->>>>>>> player
+
 
 	@SuppressWarnings("unchecked")
 	@Override
-<<<<<<< HEAD
-	protected File doInBackground(URL... urls) {
 
-		URL url = urls[0];
-		URL path = (URL) urls[1];
-		String fileName = Regex.extractFileName(url.getFile());
-		String dir = path.getPath() + fileName;
-=======
 	protected Object doInBackground(Object... params) {
 		List<URL> urls = new ArrayList<URL>();
 		List<URL> paths = new ArrayList<URL>();
 		boolean successDownload = true;
->>>>>>> player
 		
 		if (params[0] instanceof ArrayList && params[1] instanceof ArrayList) {
 			urls = (List<URL>) params[0];
@@ -57,12 +47,6 @@ public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
 			String path = Regex.getDirectory(p.getPath());
 			String fileName = Regex.extractFileName(url.toString());
 			
-<<<<<<< HEAD
-			URLConnection connection = url.openConnection();
-            connection.connect();
-            // int fileLength = connection.getContentLength();
-
-=======
 			File directory = new File(path);
 			directory.mkdir();
 			File file = new File(path+fileName);
@@ -82,20 +66,12 @@ public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
 			
 			URLConnection connection = url.openConnection();
             connection.connect();
-            
->>>>>>> player
+
             // Download the file
             InputStream input = new BufferedInputStream(url.openStream());
             FileOutputStream output = new FileOutputStream(outputFile.getPath());
             
             byte data[] = new byte[1024];
-<<<<<<< HEAD
-
-            int count;
-            count = input.read(data);
-            output.write(data, 0, count);
-
-=======
             
             int totalBytesRead = 0, incrementalBytesRead = 0;
             do {
@@ -108,7 +84,6 @@ public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
             } while(true);
             
             input.close();
->>>>>>> player
             output.flush();
             output.close();
             
@@ -118,12 +93,6 @@ public class DownloadPlaylist extends AsyncTask<Object, Integer, Object>{
 			System.err.println(e.getMessage());
 			return false;
 		}
-<<<<<<< HEAD
-		
-		return file;
-
-=======
->>>>>>> player
 	}
 	
 }

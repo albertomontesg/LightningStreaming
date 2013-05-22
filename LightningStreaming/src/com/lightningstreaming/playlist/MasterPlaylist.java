@@ -11,11 +11,8 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import com.lightningstreaming.asynctask.DownloadPlaylist;
-<<<<<<< HEAD
-import com.lightningstreaming.exceptions.ParsingException;
-=======
 import com.lightningstreaming.exceptions.CouldNotDownloadFilesException;
->>>>>>> player
+import com.lightningstreaming.exceptions.ParsingException;
 import com.lightningstreaming.regex.Regex;
 
 
@@ -54,18 +51,14 @@ public class MasterPlaylist {
 		this.setCurrentSegment(this.getCurrentStream().getMediaSequence());
 	}
 
-<<<<<<< HEAD
 	/**
 	 * Parses the File passed through.
 	 * @param file
 	 * @param url
 	 * @return Return a MasterPlaylist parsed from the file given
 	 */
-	public static MasterPlaylist parse(File file, URL url) {
-=======
 	@SuppressWarnings("unchecked")
-	public static MasterPlaylist parse(File file, URL url) throws CouldNotDownloadFilesException {
->>>>>>> player
+	public static MasterPlaylist parse(File file, URL url) throws ParsingException {
 		
 		String data = Regex.fileToString(file);
 		
@@ -82,15 +75,8 @@ public class MasterPlaylist {
 		
 		SegmentPlaylist sp = null;
 		
-		try{
-			if(Regex.count(data, "#EXTM3U")!=1);
-			{
-				throw new ParsingException();
-			}
-		}
-		catch(ParsingException e){
-			System.out.println(e.getMessage());
-		}
+		if(Regex.count(data, "#EXTM3U")!=1) throw new ParsingException();
+
 		if (Regex.count(data, "EXTINF") > 0) {
 			sp = SegmentPlaylist.parse(file, url);
 			s.put(0,sp);
