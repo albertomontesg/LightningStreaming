@@ -26,7 +26,8 @@
         android:layout_below="@+id/imageView1"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="14dp"
+        android:text="@string/app_name"
         android:textColor="#FFFFFF"
-        android:text="@string/app_name" />
+        android:textSize="30sp" />
 
 </RelativeLayout>

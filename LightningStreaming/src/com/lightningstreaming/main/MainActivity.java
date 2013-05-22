@@ -16,7 +16,11 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+		try {
+			wait(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		Intent i = new Intent(this, VideoListActivity.class);
 		startActivity(i);
 		
