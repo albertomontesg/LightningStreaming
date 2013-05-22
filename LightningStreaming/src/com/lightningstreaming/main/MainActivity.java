@@ -1,6 +1,7 @@
 package com.lightningstreaming.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
@@ -29,8 +30,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		
+		Tasca t= new Tasca();
+		   t.execute((Object[])null);
+		/*
 		Button bSegments = (Button) this.findViewById(R.id.button1);
 		Button bMaster = (Button) this.findViewById(R.id.button2);
 		Button bPlay = (Button) this.findViewById(R.id.button3);
@@ -58,35 +60,38 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		File directory = new File(getResources().getString(R.string.app_path));
 		directory.mkdirs();
-		
+		*/
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	private OnClickListener buttonA = new OnClickListener() {
-		public void onClick(View v){
-			TextView text = (TextView) findViewById(R.id.textView1);
-			text.setText("Downloading SegmentPlaylist...");
-			
-			PressedButton pressedAction = new PressedButton();
-			pressedAction.execute("S");
-		}
-	};
 	
-	private OnClickListener buttonB = new OnClickListener() {
-		public void onClick(View v){
-			TextView text = (TextView) findViewById(R.id.textView1);
-			text.setText("Downloading MasterPlaylist...");
-			
-			PressedButton pressedAction = new PressedButton();
-			pressedAction.execute("M");
-		}
-	};
+	class Tasca extends AsyncTask{
+		  protected void onPostExecute(Object[] result){
+			  Intent newi = new Intent(this, Principal.class);
+			  //passar result
+			   startActivity(newi);
+		   }
+		  protected Object doInBackground(Object... arg0) {
+			  Connection c=null;
+		    try {
+				c=new Connection(null);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    try {
+				c.Connect();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    Object[] o=new Object[2];
+		    o[0]=c.name;
+		    o[1]=c.urls;
+		    return o;
+		   }
+		  }
+
+	
+	/*
 
 	class PressedButton extends AsyncTask<Object, Object, Object> {
 
@@ -159,6 +164,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	
 	
-	
+	*/
 }
 
