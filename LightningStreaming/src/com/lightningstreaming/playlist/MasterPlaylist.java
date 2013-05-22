@@ -11,7 +11,11 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import com.lightningstreaming.asynctask.DownloadPlaylist;
+<<<<<<< HEAD
 import com.lightningstreaming.exceptions.ParsingException;
+=======
+import com.lightningstreaming.exceptions.CouldNotDownloadFilesException;
+>>>>>>> player
 import com.lightningstreaming.regex.Regex;
 
 
@@ -19,8 +23,10 @@ import com.lightningstreaming.regex.Regex;
 public class MasterPlaylist {
 
 	private float totalDuration;
+	
+	@SuppressWarnings("unused")
 	private int numSegments;
-
+	
 	private String name;
 	private URI path;
 	private URL url;
@@ -42,12 +48,13 @@ public class MasterPlaylist {
 		List<Integer> keys = new ArrayList<Integer>(streams.keySet());
 		this.setQualities(keys);
 		this.setTotalDuration(streams.get(this.getQualities().get(0)).getTotalDuration());
-		this.setNumSegments(this.getNumSegments());
+		this.numSegments = this.getNumSegments();
 		this.setCurrentQuality(this.getStreams().lastKey());
 		this.setCurrentStream(this.getStream(this.getCurrentQuality()));
 		this.setCurrentSegment(this.getCurrentStream().getMediaSequence());
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Parses the File passed through.
 	 * @param file
@@ -55,6 +62,10 @@ public class MasterPlaylist {
 	 * @return Return a MasterPlaylist parsed from the file given
 	 */
 	public static MasterPlaylist parse(File file, URL url) {
+=======
+	@SuppressWarnings("unchecked")
+	public static MasterPlaylist parse(File file, URL url) throws CouldNotDownloadFilesException {
+>>>>>>> player
 		
 		String data = Regex.fileToString(file);
 		
@@ -87,11 +98,16 @@ public class MasterPlaylist {
 		else if (Regex.count(data, "EXT-X-STREAM") > 0) {
 			Vector<String> str = new Vector<String>(Arrays.asList(data.split("#EXT-X-STREAM-INF:")));
 			str.remove(0);
-			DownloadPlaylist downloadStreamIndex = new DownloadPlaylist();
+			DownloadPlaylist downloadStreamIndex;
+			
+			List<URL> playlistUrls = new ArrayList<URL>();
+			List<URL> playlistDirs = new ArrayList<URL>();
+			List<Integer> playlistBandwidth = new ArrayList<Integer>();
 			
 			
 			for (int i = 0; i < str.size(); i++) {
-				int bandwidth = Integer.parseInt(Regex.extractString(str.get(i), "BANDWIDTH=", ","));
+				int bandwidth = Integer.parseInt(Regex.extractString(str.get(i), "BANDWIDTH=", "\n"));
+				playlistBandwidth.add(bandwidth);
 				URL urlStream = null;
 				String stream = Regex.extractString(str.get(i), "\n", "\n");
 				try {
@@ -100,16 +116,38 @@ public class MasterPlaylist {
 					}
 					else urlStream = new URL(stream);
 					
-					String streamPath = file.getPath().replace(file.getName(), Regex.extractFileName(urlStream.toString()));
-							
-					downloadStreamIndex.execute(urlStream, new URL("file", null, streamPath));
-					sp = SegmentPlaylist.parse(downloadStreamIndex.get(), urlStream);
+					String streamPath = file.getPath().replace(file.getName(), stream);
+					
+					URL dir = new URL("file", null, streamPath);
+					
+					playlistUrls.add(urlStream);
+					playlistDirs.add(dir);
+					
+					
 					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				s.put(bandwidth, sp);
 			}
+			
+			downloadStreamIndex = new DownloadPlaylist();
+			downloadStreamIndex.execute(playlistUrls, playlistDirs);
+			List<File> filesDownloaded = null;
+			try {
+				filesDownloaded = (List<File>) downloadStreamIndex.get();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			if (filesDownloaded == null) throw new CouldNotDownloadFilesException();
+			
+			for (int i = 0; i < filesDownloaded.size(); i++) {
+				sp = SegmentPlaylist.parse(filesDownloaded.get(i), playlistUrls.get(i));
+				s.put(playlistBandwidth.get(i), sp);
+			}
+			
+			
+			
 		}
 		else {
 			return null;
@@ -132,11 +170,7 @@ public class MasterPlaylist {
 	}
 
 	public int getNumSegments() {
-		return numSegments;
-	}
-
-	public void setNumSegments(int numSegments) {
-		this.numSegments = numSegments;
+		return this.streams.get(streams.firstKey()).getNumSegments();
 	}
 
 	public String getName() {
@@ -228,9 +262,56 @@ public class MasterPlaylist {
 	}
 
 	public void setCurrentQuality(int currentQuality) {
-		this.currentQuality = currentQuality;
-		if (qualities.contains(currentQuality))
+		if (qualities.contains(currentQuality)) {
+			this.currentQuality = currentQuality;
 			this.currentStream = streams.get(currentQuality);
+		}
+	}
+	
+	public int getMaximumQuality() {
+		return getQualities().get(getQualities().size()-1);
+	}
+	
+	public int getMinimumQuality() {
+		return getQualities().get(0);
+	}
+	
+	public void setMaximumQuality() {
+		int maximumQuality = getQualities().get(getQualities().size()-1);
+		setCurrentQuality(maximumQuality);
+	}
+	
+	public void setMinimumQuality() {
+		int minimumQuality = getQualities().get(0);
+		setCurrentQuality(minimumQuality);
+	}
+	
+	public boolean isMaximumQuality() {
+		return currentQuality == getMaximumQuality();
+	}
+	
+	public boolean isMinimumQuality() {
+		return currentQuality == getMinimumQuality();
+	}
+	
+	public int getUpperQualityLimit() {
+		if (isMaximumQuality())
+			return Integer.MAX_VALUE;
+		else {
+			int q = getCurrentQuality();
+			int up = getQualities().get(getQualities().indexOf(q)+1);
+			return (q+up)/2;
+		}	
+	}
+	
+	public int getLowerQualityLimit() {
+		if (isMinimumQuality())
+			return Integer.MIN_VALUE;
+		else {
+			int q = getCurrentQuality();
+			int down = getQualities().get(getQualities().indexOf(q)-1);
+			return (q+down)/2;
+		}	
 	}
 	
 }

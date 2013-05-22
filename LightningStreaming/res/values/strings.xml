@@ -4,6 +4,13 @@
     <string name="app_name">LightningStreaming</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    <string name="app_path">/mnt/sd_card/LightningStreaming</string>
+    <string name="app_path">/LightningStreaming/</string>
+    <string name="download">Download file and parse it</string>
+    <string name="segements">Segments playlist</string>
+    <string name="master">Master Playlist</string>
+    <string name="play_video">Play Video</string>
+    <string name="download_segments">Download Segments</string>
+    <string name="segements_downloaded">Segments Downloaded</string>
+    <string name="title_activity_video">VideoActivity</string>
 
 </resources>

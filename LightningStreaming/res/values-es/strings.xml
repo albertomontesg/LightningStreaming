@@ -1,0 +1,15 @@
+<resources>
+
+    <string name="action_settings">Ajustes</string>
+    <string name="app_name">LightningStreaming</string>
+    <string name="app_path">/LightningStreaming/</string>
+    <string name="download">Descargar fichero y parsearlo</string>
+    <string name="download_segments">Descargar Segmentos</string>
+    <string name="hello_world">Hola Mundo!</string>
+    <string name="master">Master Playlist</string>
+    <string name="play_video">Reproducir Video</string>
+    <string name="segements">Segments Playlist</string>
+    <string name="segements_downloaded">Segmentos Descargados</string>
+    <string name="title_activity_video">VideoActivity</string>
+
+</resources>
