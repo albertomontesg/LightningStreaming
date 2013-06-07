@@ -3,8 +3,6 @@ package com.lightningstreaming.main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -12,38 +10,34 @@ import com.lightningstreaming.regex.Regex;
 
 public class Connection {
 
-	protected Socket s;
+	protected String urlst;
 	protected URL url;
-	protected PrintWriter out;
 	protected BufferedReader in;
 	protected ArrayList<String> name;
 	protected ArrayList<String> urls;
 	public Connection (URL u) throws IOException{
 		url=u;
-		String st=url.toString();
-		s=new Socket(st,80);
-		in=new BufferedReader(new InputStreamReader(s.getInputStream()));
-		out=new PrintWriter(s.getOutputStream(),true);
-		name=new ArrayList<String>();
-		urls=new ArrayList<String>();
+		urlst=url.toString();
+		new BufferedReader(new InputStreamReader(url.openStream()));
 	}
 	
 	public void Connect () throws IOException {
-		String st=in.readLine();
-		while(st!=null){
+		name=new ArrayList<String>();
+		urls=new ArrayList<String>();
+		String st;
+		while((st = in.readLine()) != null){
 			//parse st
-			if(Regex.count(st,"<h" )>0)
+			if(Regex.count(st,".m3u8" )>0)
 			{
-				String n=Regex.extractString(st, ">", "<");
-				name.add(n);
+				String n=Regex.extractString(st, "<a", "</a>");
+				String url_m3u8=Regex.extractString(n," href=\"","\"");
+				String name_m3u8=Regex.extractString(n,">",".m3u8");
+				String total_url_m3u8=urlst+url_m3u8;
+				name.add(name_m3u8);
+				urls.add(total_url_m3u8);
 			}
-			else if(Regex.count(st, "<p>")>0){
-				String u=Regex.extractString(st, "<p>", ".</p>");
-				urls.add(u);
-			}
-			st=in.readLine();
 		}
-		s.close();
+		in.close();
 		
 	}
 }

@@ -1,6 +1,8 @@
 package com.lightningstreaming.main;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,6 +12,8 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import com.example.firstpart.Connection;
+import com.example.firstpart.Llista;
 import com.lightningstreaming.R;
 import com.lightningstreaming.activity.VideoListActivity;
 
@@ -47,28 +51,35 @@ public class MainActivity extends Activity implements OnClickListener {
 	class Tasca extends AsyncTask<Object, Integer, Object>{
 		
 		protected void onPostExecute(Object[] result){
-			Intent newi = new Intent(MainActivity.this, VideoListActivity.class);
-			//passar result
-			startActivity(newi);
+			Intent newi = new Intent(this, Llista.class);
+			  //passar result
+			  Bundle b=new Bundle();
+			  b.putStringArrayList("names", (ArrayList<String>) result[0]);
+			  b.putStringArrayList("urls", (ArrayList<String>) result[1]);
+			   startActivity(newi);
 		 }
 		
 		@Override
 		protected Object doInBackground(Object... arg0) {
 			Connection c=null;
-		    try {
-				c=new Connection(null);
-			} catch (IOException e) {
-				e.printStackTrace();
+			try {
+				c=new Connection(new URL("192.168.1.146/old_web/upload/"));
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-		    try {
+	    
+			try {
 				c.Connect();
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		    Object[] o=new Object[2];
-		    o[0]=c.name;
-		    o[1]=c.urls;
-		    return o;
+		
+	   Object [] arrays=new Object[2];
+	    arrays[0]=c.name;
+	    arrays[1]=c.urls;
+	    return arrays;
 		}
 	}
 }
