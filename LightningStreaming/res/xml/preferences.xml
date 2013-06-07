@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:key="pref_3g"
+        android:title="@string/pref_enable_use_3g"
+        android:selectable="false"
+        android:defaultValue="false" />
+    <EditTextPreference 
+        android:key="pref_ip"
+        android:title="@string/pref_server_address"
+        android:defaultValue="@string/default_ip_address"/>
+    
+</PreferenceScreen>

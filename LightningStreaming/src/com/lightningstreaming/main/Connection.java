@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 import com.lightningstreaming.regex.Regex;
@@ -18,7 +19,9 @@ public class Connection {
 	public Connection (URL u) throws IOException{
 		url=u;
 		urlst=url.toString();
-		new BufferedReader(new InputStreamReader(url.openStream()));
+		URLConnection c = url.openConnection();
+		c.setConnectTimeout(5000);
+		in = new BufferedReader(new InputStreamReader(c.getInputStream()));
 	}
 	
 	public void Connect () throws IOException {
@@ -38,6 +41,5 @@ public class Connection {
 			}
 		}
 		in.close();
-		
 	}
 }

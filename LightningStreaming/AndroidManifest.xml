@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lightningstreaming"
+    android:installLocation="internalOnly"
     android:versionCode="1"
     android:versionName="0.1" >
 
@@ -68,6 +69,10 @@
         <activity
             android:name="com.lightningstreaming.activity.VideoListActivity"
             android:label="@string/title_activity_video_list" >
+        </activity>
+        <activity
+            android:name="com.lightningstreaming.activity.SettingActivity"
+            android:label="@string/title_activity_setting" >
         </activity>
     </application>
 
