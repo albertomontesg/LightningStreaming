@@ -1,16 +1,18 @@
 package com.lightningstreaming.main;
 
-import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ProgressBar;
@@ -18,13 +20,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lightningstreaming.R;
-import com.lightningstreaming.activity.SettingActivity;
 import com.lightningstreaming.activity.VideoListActivity;
 
 public class MainActivity extends Activity implements OnClickListener {
 
 	private ProgressBar _progressBar = null;
 	private TextView _textView = null;
+	private ArrayList<String> names;
+	private ArrayList<String> urls;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +36,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		_progressBar = (ProgressBar) findViewById(R.id.progressBar1);
 		_progressBar.setMax(100);
 		_textView = (TextView) findViewById(R.id.textView2);
-		
+		names = new ArrayList<String>();
+		urls = new ArrayList<String>();
 		
 		DownloadIndex downloadIndex= new DownloadIndex();
 		downloadIndex.execute((Object[])null);
 		
-		// change the textview content to (getting_index) and download the m3u8 of all the videos
-		
-		// Then pass the information to the video list activity.
+		File dir = new File(Environment.getExternalStorageDirectory().toString()+getString(R.string.app_path));
+		if (!dir.exists()) dir.mkdir();
 		
 	}
 
@@ -48,83 +51,62 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onDestroy() {
 		super.onDestroy();
 		_progressBar=null;
+		_textView = null;
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.action_settings:
-			startActivity(new Intent(this, SettingActivity.class));
-			return true;
-		}
-		
 		return false;
 	}
 
 	
-	class DownloadIndex extends AsyncTask<Object, Integer, Object[]>{
+	class DownloadIndex extends AsyncTask<Object, Integer, Integer>{
 		
-		@SuppressWarnings({ "unchecked", "unused" })
-		protected void onPostExecute(Object[] result){
+		protected void onPostExecute(Integer result){
 			Intent i = new Intent(MainActivity.this, VideoListActivity.class);
 			//passar result
-			if (result[0].getClass() == Integer.class) {
+			if (result < 1) {
 				Context context = getApplicationContext();
-				String text = "Server Unavailable!";
+				String text = null;
+				if (result == 0) text = "No videos at the server!";
+				else if(result == -1) text = "Server Unavailable!";
 				Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
-				toast.show();	
+				toast.show();
 			}
-			else if (result != null) {
-				Bundle b=new Bundle();
-				b.putStringArrayList("names", (ArrayList<String>) result[0]);
-				b.putStringArrayList("urls", (ArrayList<String>) result[1]);
-				i.putExtras(b);
-			} else {
-				Context context = getApplicationContext();
-				String text = "No videos at the server!";
-				Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
-				toast.show();	
-			}
-			//startActivity(i);
+			Bundle b=new Bundle();
+			b.putStringArrayList("names", (ArrayList<String>) names);
+			b.putStringArrayList("urls", (ArrayList<String>) urls);
+			i.putExtras(b);
+			startActivity(i);
 		 }
 		
 		@Override
-		protected Object[] doInBackground(Object... arg0) {
+		protected Integer doInBackground(Object... arg0) {
 			Connection c=null;
+			SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+			String u = sharedPrefs.getString("pref_ip", null);
 			try {
-				URL url = new URL("http://172.16.0.123/pbe/");	//Server at university: 192.168.1.146/old_web/upload/
+				URL url = new URL(u);	//Server at university: 192.168.1.146/old_web/upload/
 				c=new Connection(url);
-			}catch(IOException e1) {
-				e1.printStackTrace();
-				Object[] i= {0};
-				return i;
-			}
-			try {
 				c.Connect();
-			} catch (IOException e2) {
-				e2.printStackTrace();
-				return null;
+			}catch(Exception e) {
+				e.printStackTrace();
+				return -1;
 			}
 			
 			this.publishProgress(10);
 			
 			// download the m3u8 file for each video
-			int l = c.name.size();
+			//int l = c.name.size();
 			
 			
-			
-		
-			Object[] arrays=new Object[2];
-			arrays[0]=c.name;
-			arrays[1]=c.urls;
-		    return arrays;
+			if (c.name.size() == 0) {
+				return 0;
+			} else {
+				names=c.name;
+				urls=c.urls;
+			    return 1;
+			}
 		}
 		
 		@Override
