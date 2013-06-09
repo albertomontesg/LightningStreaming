@@ -1,7 +1,12 @@
 package com.lightningstreaming.main;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -28,6 +33,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView _textView = null;
 	private ArrayList<String> names;
 	private ArrayList<String> urls;
+	private URL serverURL = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +92,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 			String u = sharedPrefs.getString("pref_ip", null);
 			try {
-				URL url = new URL(u);	//Server at university: 192.168.1.146/old_web/upload/
-				c=new Connection(url);
+				serverURL = new URL(u);	//Server at university: 192.168.1.146/old_web/upload/
+				c=new Connection(serverURL);
 				c.Connect();
 			}catch(Exception e) {
 				e.printStackTrace();
@@ -97,15 +103,61 @@ public class MainActivity extends Activity implements OnClickListener {
 			this.publishProgress(10);
 			
 			// download the m3u8 file for each video
-			//int l = c.name.size();
+			names=c.name;
+			urls=c.urls;
+			int l = c.name.size();
+			
+			for (int i = 0; i < l; i++) {
+				URL url = null;
+				File file = null;
+				try {
+					url = new URL(c.urls.get(i));
+					file = new File(Environment.getExternalStorageDirectory().toString()+getString(R.string.app_path)+c.name.get(i)+".m3u8");
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+					break;
+				}
+				downloadFile(url, file);
+				int progress = 10 + (i+1)*90/l;
+				this.publishProgress(progress);
+			}
 			
 			
-			if (c.name.size() == 0) {
-				return 0;
-			} else {
-				names=c.name;
-				urls=c.urls;
-			    return 1;
+			
+			
+			if (c.name.size() == 0) return 0;
+			else return 1;
+		}
+		
+		private boolean downloadFile(URL url, File outputFile) {
+			if (outputFile.exists()) return false;
+			try {
+				
+				URLConnection connection = url.openConnection();
+	            connection.connect();
+
+	            // Download the file
+	            InputStream input = new BufferedInputStream(url.openStream());
+	            FileOutputStream output = new FileOutputStream(outputFile.getPath());
+	            
+	            byte data[] = new byte[1024];
+	            
+	            do {
+	                int numread = input.read(data);   
+	                if (numread <= 0)   
+	                    break; 
+	                output.write(data, 0, numread);
+	            } while(true);
+	            
+	            input.close();
+	            output.flush();
+	            output.close();
+	            
+	            return true;
+	            
+			} catch (Exception e) {
+				System.err.println(e.getMessage());
+				return false;
 			}
 		}
 		
@@ -117,7 +169,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 		}
 	}
-
+	
 
 	@Override
 	public void onClick(View v) {

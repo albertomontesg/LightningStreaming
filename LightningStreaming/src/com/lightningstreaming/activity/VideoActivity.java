@@ -299,8 +299,6 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		Uri dat = IntentHelper.getIntentUri(i);
 		if (dat == null) {
 			resultFinish(RESULT_FAILED);
-		} else if (!isConnected || !isWiFi) {
-			resultFinish(NO_INTERNET_CONNECTION);
 		} else {
 			vPlayerHandler.sendEmptyMessage(PARSING_START);
 			
@@ -399,9 +397,6 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		case RESULT_FAILED:
 			ToastHelper.showToast(this, Toast.LENGTH_LONG, R.string.video_cannot_play);
 			break;
-		case NO_INTERNET_CONNECTION:
-			ToastHelper.showToast(this, Toast.LENGTH_LONG, R.string.not_internet_connection);
-			break;
 		case RESULT_CANCELED:
 		case RESULT_OK:
 			break;
@@ -411,7 +406,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 
 	private void resultFinish(int resultCode) {
 		applyResult(resultCode);
-		if (UIUtils.hasICS() && resultCode != RESULT_FAILED && resultCode != NO_INTERNET_CONNECTION) {
+		if (UIUtils.hasICS() && resultCode != RESULT_FAILED) {
 			android.os.Process.killProcess(android.os.Process.myPid());
 		} else {
 			finish();

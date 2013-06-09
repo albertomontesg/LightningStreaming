@@ -9,5 +9,6 @@
         android:key="pref_ip"
         android:title="@string/pref_server_address"
         android:defaultValue="@string/default_ip_address"/>
+    
 
 </PreferenceScreen>

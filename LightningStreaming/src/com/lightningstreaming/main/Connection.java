@@ -20,6 +20,7 @@ public class Connection {
 	public Connection (URL u) throws Exception{
 		url=u;
 		urlst=url.toString();
+		if (!urlst.endsWith("/")) urlst = urlst +"/";
 		URLConnection c = url.openConnection();
 		c.setConnectTimeout(5000);
 		InputStream inputStream = c.getInputStream();

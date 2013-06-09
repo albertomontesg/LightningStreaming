@@ -9,35 +9,38 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="150dp"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_launcher" />
-
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageView1"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="14dp"
         android:text="@string/app_name"
         android:textColor="#FFFFFF"
         android:textSize="30sp" />
-
+    
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignBottom="@+id/textView1"
+        android:layout_marginBottom="36dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_launcher" />
+    
     <ProgressBar
         android:id="@+id/progressBar1"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/imageView1"
         android:layout_below="@+id/textView1"
-        android:layout_marginTop="20dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:maxWidth="48dp"
+        android:minWidth="180dp" />
 
     <TextView
         android:id="@+id/textView2"
