@@ -3,6 +3,8 @@ package com.lightningstreaming.activity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import android.app.ListActivity;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 import com.lightningstreaming.R;
 import com.lightningstreaming.main.MainActivity;
 import com.lightningstreaming.regex.Regex;
+import com.yixia.zi.utils.StringHelper;
 import com.yixia.zi.utils.ToastHelper;
 
 public class VideoListActivity extends ListActivity {
@@ -34,7 +37,7 @@ public class VideoListActivity extends ListActivity {
 	private ArrayList<String> support=new ArrayList<String>();
 	private ListView listView;
 	
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation" })
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -46,6 +49,7 @@ public class VideoListActivity extends ListActivity {
 	    String [] values1 = list.toArray(new String[list.size()]);
 	    String [] values2 = urls.toArray(new String[urls.size()]);
 	    String [] values = new String[values1.length];
+	    String [] info = new String[values1.length];
 	    
 	    if (values.length == 0) {
 	    	TextView text = new TextView(getBaseContext());
@@ -58,15 +62,44 @@ public class VideoListActivity extends ListActivity {
 	    	((ViewGroup) listView.getParent()).addView(text);
 			listView.setEmptyView(text);
 	    }
+	    final List<String[]> listVideos = new LinkedList<String[]>();
 	    
 	    for (int i=0;i<values1.length; i++){
-	    	File f = new File(Environment.getExternalStorageDirectory().toString()+getString(R.string.app_path)+values[i]+"m3u8");
-	    	values[i]=values1[i]+"\n"+getInfo(f);
+	    	File f = new File(Environment.getExternalStorageDirectory().toString()+getString(R.string.app_path)+values1[i]+".m3u8");
+	    	values[i]=values1[i];
+	    	info[i]=getInfo(f);
 	    	support.add(values2[i]);
+	    	
+	        listVideos.add(new String[] { values[i], info[i] });
+	    	//String[] from = {values[i], info[i] };
+	    	//int[] to = { android.R.id.text1, android.R.id.text2 };
+	    	//SimpleAdapter adapter = new SimpleAdapter(this, android.R.layout.simple_list_item_2, from, to);
+	    	//setListAdapter(adapter);
 	    }
-	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-	            android.R.layout.simple_list_item_1, values);
-	    setListAdapter(adapter);
+	    
+	    setListAdapter(new ArrayAdapter<String[]>(
+	            this,
+	            android.R.layout.simple_list_item_2,
+	            android.R.id.text1,
+	            listVideos) {
+	            	 
+	                @Override
+	                public View getView(int position, View convertView, ViewGroup parent) {
+	     
+	                    // Must always return just a View.
+	                    View view = super.getView(position, convertView, parent);
+	     
+	                    // If you look at the android.R.layout.simple_list_item_2 source, you'll see
+	                    // it's a TwoLineListItem with 2 TextViews - text1 and text2.
+	                    //TwoLineListItem listItem = (TwoLineListItem) view;
+	                    String[] entry = listVideos.get(position);
+	                    TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+	                    TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+	                    text1.setText(entry[0]);
+	                    text2.setText(entry[1]);
+	                    return view;
+	                }
+	            });
 	    
 	}
 
@@ -137,7 +170,7 @@ public class VideoListActivity extends ListActivity {
 			float dur = 0;
 			for (int i = 0; i < seg.size(); i++)
 				dur = Float.parseFloat(Regex.extractString(seg.get(i), ":", ","));
-			info = getString(R.string.duration) + ": " + (int)dur/60 + ":" + (int)dur%60;
+			info = getString(R.string.duration) + ": " + StringHelper.generateTime((long)dur*1000);
 		}
 		else if (Regex.count(data, "EXT-X-STREAM") > 0) {
 			info = getString(R.string.qualities_available) + ": " + Regex.count(data, "EXT-X-STREAM");

@@ -51,7 +51,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		File dir = new File(Environment.getExternalStorageDirectory().toString()+getString(R.string.app_path));
 		if (!dir.exists()) dir.mkdir();
 		
-	}
+	} 
 
 	@Override
 	protected void onDestroy() {

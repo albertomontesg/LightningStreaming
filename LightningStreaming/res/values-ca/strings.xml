@@ -1,0 +1,17 @@
+<resources>
+
+    <string name="action_refresh">Actualitza</string>
+    <string name="action_settings">Configuració</string>
+    <string name="app_name">Lightning Streaming</string>
+    <string name="downloading_indexs">Descarregant Indexes de Videos...</string>
+    <string name="duration">Duració</string>
+    <string name="no_videos">0 Vídeos</string>
+    <string name="not_internet_connection">No estàs connectat a Internet</string>
+    <string name="play_video">Reproduir Vídeo</string>
+    <string name="pref_server_address">Adressa del Servidor</string>
+    <string name="qualities_available">Qualitats Disponibles</string>
+    <string name="starting_connection">Obtenint Indexes del Servidor</string>
+    <string name="title_activity_setting">Configuració</string>
+    <string name="title_activity_video_list">Llista de Vídeos</string>
+
+</resources>
