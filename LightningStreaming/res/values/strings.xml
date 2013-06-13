@@ -16,11 +16,21 @@
     <string name="title_activity_video_list">List of Videos</string>
     <string name="starting_connection">Getting index at the server&#8230;</string>
     <string name="downloading_indexs">Downloading Video Index&#8230;</string>
-    <string name="preference_file_key">com.lightningstreaming.PREFERENCE_FILE_KEY</string>
     <string name="default_ip_address">http://172.16.0.123/pbe/</string>
     <string name="title_activity_setting">Settings</string>
     <string name="pref_enable_use_3g">Enable Using 3G</string>
     <string name="pref_server_address">Server Address</string>
     <string name="no_videos">0 videos</string>
+    <string name="not_internet_connection">Not Internet connection</string>
+    <string name="duration">Duration</string>
+    <string name="qualities_available">Qualities Available</string>
+    
+    <string name="language">Language</string>
+    <string name="choose_language">Choose Language:</string>
+    <string-array name="languages">
+        <item>English</item>
+        <item>Español</item>
+        <item>Català</item>
+    </string-array>
 
 </resources>

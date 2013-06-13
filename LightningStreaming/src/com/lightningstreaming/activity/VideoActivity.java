@@ -42,8 +42,6 @@ import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -55,8 +53,8 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.view.SurfaceHolder;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -287,14 +285,6 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	}
 
 	private void parseIntent(Intent i) {
-		// Check the connectivity available to play or not the video depending on the settings
-		ConnectivityManager cm = (ConnectivityManager)this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-		boolean isConnected = false, isWiFi = false;
-		if (activeNetwork != null) {
-			isConnected = activeNetwork.isConnectedOrConnecting();
-			isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
-		}
 		
 		Uri dat = IntentHelper.getIntentUri(i);
 		if (dat == null) {
@@ -330,7 +320,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		mUri = Uri.parse(mPlaylist.getCurrentStream().getUrl().toString());
 		
 		mNeedLock = i.getBooleanExtra("lockScreen", false);
-		mDisplayName = i.getStringExtra("displayName");
+		mDisplayName = mPlaylist.getName();
 		mFromStart = i.getBooleanExtra("fromStart", false);
 		mSaveUri = i.getBooleanExtra("saveUri", true);
 		mStartPos = i.getFloatExtra("startPosition", -1.0f);

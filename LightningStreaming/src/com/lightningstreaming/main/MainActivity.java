@@ -118,12 +118,10 @@ public class MainActivity extends Activity implements OnClickListener {
 					break;
 				}
 				downloadFile(url, file);
+				
 				int progress = 10 + (i+1)*90/l;
 				this.publishProgress(progress);
 			}
-			
-			
-			
 			
 			if (c.name.size() == 0) return 0;
 			else return 1;

@@ -15,8 +15,6 @@ import com.lightningstreaming.exceptions.CouldNotDownloadFilesException;
 import com.lightningstreaming.exceptions.ParsingException;
 import com.lightningstreaming.regex.Regex;
 
-
-
 public class MasterPlaylist {
 
 	private float totalDuration;
@@ -62,14 +60,13 @@ public class MasterPlaylist {
 		
 		String data = Regex.fileToString(file);
 		
-		String n = file.getName();
+		String n = Regex.extractExtension(file.getName(), ".m3u8");
 		URI p = null;
 		try {
 			p = new URI(file.getAbsolutePath());
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		
 		
 		TreeMap <Integer, SegmentPlaylist> s = new TreeMap<Integer, SegmentPlaylist>();
 		
@@ -98,7 +95,7 @@ public class MasterPlaylist {
 				String stream = Regex.extractString(str.get(i), "\n", "\n");
 				try {
 					if (Regex.count(str.get(i), "www") == 0) {
-						urlStream = new URL(url.toString().replace(n, stream));
+						urlStream = new URL(url.toString().replace(file.getName(), stream));
 					}
 					else urlStream = new URL(stream);
 					
@@ -142,6 +139,9 @@ public class MasterPlaylist {
 		MasterPlaylist playlist = new MasterPlaylist(n, p, url, s);
 		return playlist;
 	}
+	
+	
+	
 	public void ChangeStream(int quality){
 		currentStream=streams.get(quality);
 		

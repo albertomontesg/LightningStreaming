@@ -61,6 +61,16 @@ public class Regex {
 		
 	}
 	
+	public static String extractExtension(String input, String extension) {
+		Pattern pattern = Pattern.compile("(.*?)"+extension);
+		Matcher matcher = pattern.matcher(input);
+		if (matcher.find())
+		    return matcher.group(1);
+		else
+			return input;
+		
+	}
+	
 	public static String extractFileName(File file) {
 		String path = file.getName();
 		String[] t = path.split("/");
