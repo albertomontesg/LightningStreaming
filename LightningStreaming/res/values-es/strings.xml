@@ -3,7 +3,7 @@
     <string name="action_refresh">Actualiza</string>
     <string name="action_settings">Configuración</string>
     <string name="app_name">Lightning Streaming</string>
-    <string name="downloading_indexs">Descargando índices de Videos</string>
+    <string name="downloading_indexs">Descargando índices de Videos&#8230;</string>
     <string name="duration">Duración</string>
     <string name="no_videos">0 Videos</string>
     <string name="not_internet_connection">No estás conectado a Internet</string>

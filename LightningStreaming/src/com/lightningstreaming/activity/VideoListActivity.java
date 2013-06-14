@@ -1,6 +1,8 @@
 package com.lightningstreaming.activity;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -27,7 +29,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lightningstreaming.R;
+import com.lightningstreaming.exceptions.ParsingException;
 import com.lightningstreaming.main.MainActivity;
+import com.lightningstreaming.playlist.MasterPlaylist;
 import com.lightningstreaming.regex.Regex;
 import com.yixia.zi.utils.StringHelper;
 import com.yixia.zi.utils.ToastHelper;
@@ -67,14 +71,10 @@ public class VideoListActivity extends ListActivity {
 	    for (int i=0;i<values1.length; i++){
 	    	File f = new File(Environment.getExternalStorageDirectory().toString()+getString(R.string.app_path)+values1[i]+".m3u8");
 	    	values[i]=values1[i];
-	    	info[i]=getInfo(f);
 	    	support.add(values2[i]);
+	    	info[i]=getInfo(f, i);
 	    	
 	        listVideos.add(new String[] { values[i], info[i] });
-	    	//String[] from = {values[i], info[i] };
-	    	//int[] to = { android.R.id.text1, android.R.id.text2 };
-	    	//SimpleAdapter adapter = new SimpleAdapter(this, android.R.layout.simple_list_item_2, from, to);
-	    	//setListAdapter(adapter);
 	    }
 	    
 	    setListAdapter(new ArrayAdapter<String[]>(
@@ -85,13 +85,9 @@ public class VideoListActivity extends ListActivity {
 	            	 
 	                @Override
 	                public View getView(int position, View convertView, ViewGroup parent) {
-	     
-	                    // Must always return just a View.
+	                	
 	                    View view = super.getView(position, convertView, parent);
-	     
-	                    // If you look at the android.R.layout.simple_list_item_2 source, you'll see
-	                    // it's a TwoLineListItem with 2 TextViews - text1 and text2.
-	                    //TwoLineListItem listItem = (TwoLineListItem) view;
+	                    
 	                    String[] entry = listVideos.get(position);
 	                    TextView text1 = (TextView) view.findViewById(android.R.id.text1);
 	                    TextView text2 = (TextView) view.findViewById(android.R.id.text2);
@@ -137,15 +133,13 @@ public class VideoListActivity extends ListActivity {
 
 	@Override 
     public void onListItemClick(ListView l, View v, int position, long id) {
-        // Do something when a list item is clicked
-		// String item = (String) getListAdapter().getItem(position);
-	    
+		
 		// Check the connectivity available to play or not the video depending on the settings
 		ConnectivityManager cm = (ConnectivityManager)this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+		NetworkInfo mWifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 		boolean isConnected = false;
-		if (activeNetwork != null) {
-			isConnected = activeNetwork.isConnectedOrConnecting();
+		if (mWifi != null) {
+			isConnected = mWifi.isConnected();
 		}
 		if (!isConnected) ToastHelper.showToast(this, Toast.LENGTH_LONG, R.string.not_internet_connection);
 		else {
@@ -160,20 +154,15 @@ public class VideoListActivity extends ListActivity {
 		}
 	}
 	
-	private String getInfo(File index) {
-		String info = null;
-		String data = Regex.fileToString(index);
-		if (!index.exists()) return info;
-		if (Regex.count(data, "EXTINF") > 0) {
-			Vector<String> seg = new Vector<String>(Arrays.asList(data.split("#EXTINF")));
-			seg.remove(0);
-			float dur = 0;
-			for (int i = 0; i < seg.size(); i++)
-				dur = Float.parseFloat(Regex.extractString(seg.get(i), ":", ","));
-			info = getString(R.string.duration) + ": " + StringHelper.generateTime((long)dur*1000);
-		}
-		else if (Regex.count(data, "EXT-X-STREAM") > 0) {
-			info = getString(R.string.qualities_available) + ": " + Regex.count(data, "EXT-X-STREAM");
+	private String getInfo(File index, int i) {
+		String info = getString(R.string.duration) + ": ";
+		MasterPlaylist playlist = null;
+		try {
+			playlist = MasterPlaylist.parse(index, new URL(support.get(i)));
+			info = info + StringHelper.generateTime((long)playlist.getTotalDuration()*1000);
+			if (!playlist.isOnlySegmentPlaylist()) info = info + "        " + getString(R.string.qualities_available) + ": " + playlist.getNumStreams();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		return info;

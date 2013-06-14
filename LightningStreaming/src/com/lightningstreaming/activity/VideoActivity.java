@@ -76,7 +76,6 @@ import com.yixia.zi.utils.UIUtils;
 public class VideoActivity extends Activity implements MediaController.MediaPlayerControl, VideoView.SurfaceCallback {
 	
 	public static final int RESULT_FAILED = -7;
-	public static final int NO_INTERNET_CONNECTION = -11;
 	public static final int HI_COUNT = 5;
 	public static final int LOW_COUNT = - HI_COUNT;
 	
@@ -302,7 +301,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		if (!datString.equals(dat.toString()))
 			dat = Uri.parse(datString);
 
-		
+		setmPlaylist(null);
 		File index = new File(dat.toString());
 		try {
 			mUrlPlaylist = new URL(i.getStringExtra("UrlPlaylist"));
@@ -313,14 +312,17 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 				Log.i("Quality", "Setted the maximum quality");
 			}
 			
+			mUri = Uri.parse(mPlaylist.getCurrentStream().getUrl().toString());
+			mDisplayName = mPlaylist.getName();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
+			resultFinish(RESULT_FAILED);
 		}
 
-		mUri = Uri.parse(mPlaylist.getCurrentStream().getUrl().toString());
+		
 		
 		mNeedLock = i.getBooleanExtra("lockScreen", false);
-		mDisplayName = mPlaylist.getName();
 		mFromStart = i.getBooleanExtra("fromStart", false);
 		mSaveUri = i.getBooleanExtra("saveUri", true);
 		mStartPos = i.getFloatExtra("startPosition", -1.0f);
@@ -795,7 +797,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		public void onDownloadRateChanged(int kbPerSec) {
 			//!Media.isNative(mUri.toString())
 			if (mMediaController != null) {
-				mMediaController.setDownloadRate(String.format("%dKB/s", kbPerSec));
+				//mMediaController.setDownloadRate(String.format("%dKB/s", kbPerSec));
 				wasPlaying = vPlayer.isPlaying();
 				if (!mPlaylist.isOnlySegmentPlaylist()) {
 					if (mPlaylist.getUpperQualityLimit()/1000 <= (kbPerSec)) {
