@@ -601,7 +601,8 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 	public void reduceQuality () {
 		wasPlaying = isPlaying();	
 		stop();
-		float currentPosition = (float) (getCurrentPosition())/getDuration();
+		float currentPosition = (float) (getCurrentPosition()-10000)/getDuration();
+		Log.i("Position", "currentPosition: "+ currentPosition);
 		mPlaylist.decreaseQuality();
 		mUri = Uri.parse(mPlaylist.getStream(mPlaylist.getCurrentQuality()).getUrl().toString());
 		
@@ -612,7 +613,8 @@ public class PlayerService extends Service implements OnBufferingUpdateListener,
 	public void increaseQuality() {
 		wasPlaying = isPlaying();		
 		stop();
-		float currentPosition = (float) (getCurrentPosition()-10)/getDuration();
+		float currentPosition = (float) (getCurrentPosition()-10000)/getDuration();
+		Log.i("Position", "currentPosition: "+ currentPosition);
 		mPlaylist.increaseQuality();
 		mUri = Uri.parse(mPlaylist.getStream(mPlaylist.getCurrentQuality()).getUrl().toString());
 		

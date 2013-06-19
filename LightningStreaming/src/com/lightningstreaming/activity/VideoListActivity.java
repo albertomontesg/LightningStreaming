@@ -1,13 +1,10 @@
 package com.lightningstreaming.activity;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -29,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lightningstreaming.R;
-import com.lightningstreaming.exceptions.ParsingException;
 import com.lightningstreaming.main.MainActivity;
 import com.lightningstreaming.playlist.MasterPlaylist;
 import com.lightningstreaming.regex.Regex;

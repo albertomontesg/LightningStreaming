@@ -76,7 +76,7 @@ import com.yixia.zi.utils.UIUtils;
 public class VideoActivity extends Activity implements MediaController.MediaPlayerControl, VideoView.SurfaceCallback {
 	
 	public static final int RESULT_FAILED = -7;
-	public static final int HI_COUNT = 5;
+	public static final int HI_COUNT = 3;
 	public static final int LOW_COUNT = - HI_COUNT;
 	
 	private static final IntentFilter USER_PRESENT_FILTER = new IntentFilter(Intent.ACTION_USER_PRESENT);
@@ -797,7 +797,7 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 		public void onDownloadRateChanged(int kbPerSec) {
 			//!Media.isNative(mUri.toString())
 			if (mMediaController != null) {
-				//mMediaController.setDownloadRate(String.format("%dKB/s", kbPerSec));
+				mMediaController.setDownloadRate(String.format("%dKB/s", kbPerSec));
 				wasPlaying = vPlayer.isPlaying();
 				if (!mPlaylist.isOnlySegmentPlaylist()) {
 					if (mPlaylist.getUpperQualityLimit()/1000 <= (kbPerSec)) {
@@ -837,8 +837,8 @@ public class VideoActivity extends Activity implements MediaController.MediaPlay
 	private float getStartPosition() {
 		if (mFromStart)
 			return 1.1f;
-		if (mStartPos <= 0.0f || mStartPos >= 1.0f)
-			return mSession.getFloat(mUri + VP.SESSION_LAST_POSITION_SUFIX, 7.7f);
+		//if (mStartPos <= 0.0f || mStartPos >= 1.0f)
+		//	return mSession.getFloat(mUri + VP.SESSION_LAST_POSITION_SUFIX, 7.7f);
 		return mStartPos;
 	}
 

@@ -3,11 +3,13 @@
     <string name="action_refresh">Actualiza</string>
     <string name="action_settings">Configuración</string>
     <string name="app_name">Lightning Streaming</string>
+    <string name="app_path">/LightningStreaming/</string>
+    <string name="title_activity_video">VideoActivity</string>
     <string name="downloading_indexs">Descargando índices de Videos&#8230;</string>
     <string name="duration">Duración</string>
     <string name="no_videos">0 Videos</string>
     <string name="not_internet_connection">No estás conectado a Internet</string>
-    <string name="play_video">Reproducir Video</string>
+    <string name="default_ip_address">http://172.16.0.123/pbe/</string>
     <string name="pref_server_address">Dirección del Servidor</string>
     <string name="qualities_available">Calidades Disponibles</string>
     <string name="starting_connection">Obteniendo índices del servidor</string>
